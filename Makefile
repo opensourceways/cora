@@ -113,6 +113,42 @@ smoke-filter: build-prod smoke-build
 		--filter "$(FILTER)" \
 		$(if $(VERBOSE),--verbose)
 
+# ── Release ───────────────────────────────────────────────────────────────────
+
+RELEASE_VERSION ?= $(VERSION)
+DIST_DIR      := dist
+RELEASE_DIR   := $(DIST_DIR)/cora-$(RELEASE_VERSION)
+PLATFORMS     := darwin/amd64 darwin/arm64 linux/amd64 linux/arm64
+
+.PHONY: release
+release: clean build-prod
+	@rm -rf $(DIST_DIR)
+	@mkdir -p $(RELEASE_DIR)
+	@# Copy source
+	@cp -R go.mod go.sum Makefile cmd internal pkg assets config scenarios spec readme.md readme_en.md $(RELEASE_DIR)
+	@rm -rf $(RELEASE_DIR)/config/config.yaml $(RELEASE_DIR)/config/smoke-config.yaml
+	@# Build per platform
+	@for p in $(PLATFORMS); do \
+		goos=$$(echo $$p | cut -d/ -f1); \
+		goarch=$$(echo $$p | cut -d/ -f2); \
+		out=$(RELEASE_DIR)/cora-$$goos-$$goarch; \
+		CGO_ENABLED=0 GOOS=$$goos GOARCH=$$goarch go build -ldflags "$(LDFLAGS) -s -w" -o $$out $(CMD); \
+		echo "  built: $$out"; \
+	done
+	@# Package source tarball
+	@echo "Creating source archive..."
+	@tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).src.tar.gz -C $(DIST_DIR) cora-$(RELEASE_VERSION)
+	@# Package per-platform binary tarballs
+	@for p in $(PLATFORMS); do \
+		goos=$$(echo $$p | cut -d/ -f1); \
+		goarch=$$(echo $$p | cut -d/ -f2); \
+		binary=cora-$$goos-$$goarch; \
+		tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).$$goos-$$goarch.tar.gz -C $(RELEASE_DIR) $$binary; \
+		echo "  archive: $(DIST_DIR)/cora-$(RELEASE_VERSION).$$goos-$$goarch.tar.gz"; \
+	done
+	@echo "Release $(RELEASE_VERSION) built in $(DIST_DIR)/"
+	@ls -lh $(DIST_DIR)/*.tar.gz
+
 # ── Help ──────────────────────────────────────────────────────────────────────
 
 .PHONY: help
