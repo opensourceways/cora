@@ -124,21 +124,30 @@ cora etherpad pads create-pad --pad-id new-pad
 # 列出所有 Job
 cora jenkins jobs list
 
-# 获取单个 Job 详情
-cora jenkins jobs get --name my-job
+# 获取 Job 详情（嵌套 Folder Job 使用 /job/ 路径）
+cora jenkins jobs get --name "kubeconfig/job/get-temporary-kubeconfig"
 
-# 触发构建
+# 触发无参数构建
 cora jenkins jobs build --name my-job
+
+# 触发参数化构建（通过 --data 传入 build parameters）
+cora jenkins jobs build --name "kubeconfig/job/get-temporary-kubeconfig" \
+  --data '{"parameter":[{"name":"NAMESPACE","value":"test-view"}]}'
 
 # 启用 / 禁用 Job
 cora jenkins jobs enable-job --name my-job
 cora jenkins jobs disable-job --name my-job
 
-# 删除 Job
-cora jenkins jobs delete --name my-job
+# 获取构建详情（含 artifacts 列表）
+cora jenkins builds get --name "kubeconfig/job/get-temporary-kubeconfig" --number 11
 
-# 获取构建详情
-cora jenkins builds get --name my-job --number 1
+# 下载指定 artifact
+cora jenkins builds download --name "kubeconfig/job/get-temporary-kubeconfig" \
+  --number 11 --filename "kubeconfig-test-view.yaml"
+
+# 下载第一个 artifact（自动从构建详情发现文件名）
+cora jenkins builds download --name "kubeconfig/job/get-temporary-kubeconfig" \
+  --number 11 --first
 
 # 查看队列
 cora jenkins queue list
@@ -195,6 +204,10 @@ cora 内置了常用操作的 View 定义（字段选取、格式化），同时
 | forum    | `topics get`  | 竖式 KV 表      |
 | forum    | `posts list`  | 横向表格         |
 | etherpad | `pads list`   | 横向表格         |
+| jenkins  | `jobs list`   | 横向表格         |
+| jenkins  | `jobs get`    | 竖式 KV 表      |
+| jenkins  | `builds get`  | 竖式 KV 表（含 Artifacts） |
+| jenkins  | `queue list`  | 横向表格         |
 
 ### 配置 views.yaml
 
@@ -360,6 +373,9 @@ services:
   # ── Jenkins（内置 Spec，无需 spec_url）──
   jenkins:
     base_url: https://jenkins.example.com          # 必填，无默认值
+    # view 为可选配置。当 Jenkins 任务嵌套在某个 View（如 ai-pipeline）中时，
+    # 设置后会自动为 /job/ 路径添加 /view/{view} 前缀，确保请求通过 Ingress 路由。
+    view: ai-pipeline                              # 可选
     auth:
       jenkins:
         username: "你的 Jenkins 用户名"

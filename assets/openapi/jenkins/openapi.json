@@ -19,7 +19,7 @@
   "tags": [
     {
       "name": "Jobs",
-      "description": "Job management — list, get"
+      "description": "Job management — list, get, trigger"
     },
     {
       "name": "Builds",
@@ -162,6 +162,70 @@
         }
       }
     },
+    "/job/{name}/build": {
+      "post": {
+        "summary": "Trigger a build",
+        "description": "Trigger a new build for the specified job. For parameterised jobs, pass build parameters as query parameters (e.g. --PARAM value) or use --data with a JSON body.",
+        "operationId": "buildJob",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Job name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Build parameters (for parameterised jobs). Uses Jenkins JSON format.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parameter": {
+                    "type": "array",
+                    "description": "List of build parameters",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Parameter name"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Parameter value"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Build queued. A Location header points to the queue item.",
+            "headers": {
+              "Location": {
+                "description": "Queue item URL",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/job/{name}/{number}/api/json": {
       "get": {
         "summary": "Get build details",
@@ -243,6 +307,55 @@
                       "type": "array"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job/{name}/{number}/artifact/{filename}": {
+      "get": {
+        "summary": "Download build artifact",
+        "description": "Download a build artifact file by name. Returns the raw file content.",
+        "operationId": "downloadArtifact",
+        "tags": [
+          "Builds"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "description": "Artifact file name (as shown in build details). Omit when using --first.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artifact file content",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }

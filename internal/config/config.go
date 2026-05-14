@@ -43,6 +43,10 @@ type ServiceConfig struct {
 	// BaseURL is the actual API root (overrides spec's servers[0].url).
 	BaseURL string `yaml:"base_url" mapstructure:"base_url"`
 
+	// View is an optional Jenkins view name. When set, /view/{view} is
+	// prepended to /job/ paths so requests pass through Ingress routing.
+	View string `yaml:"view" mapstructure:"view"`
+
 	// Auth holds service-level credential configuration.
 	Auth AuthConfig `yaml:"auth" mapstructure:"auth"`
 }

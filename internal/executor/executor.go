@@ -33,7 +33,7 @@ type Request struct {
 	Method       string            // "GET", "POST", …
 	PathParams   map[string]string // {id} → "123"
 	QueryParams  map[string]string
-	Body         map[string]interface{}
+	Body         map[string]any
 	Format       string // "table" | "json" | "yaml"
 	DryRun       bool
 	ViewConfig   *view.ViewConfig // nil → generic fallback rendering
@@ -50,23 +50,48 @@ func New(cfg *config.Config) *Executor {
 	return &Executor{cfg: cfg, client: &http.Client{Timeout: defaultTimeout}}
 }
 
+// ExecuteRaw performs the HTTP request and returns the raw response body bytes.
+// It does not print to stdout — useful for programmatic two-step flows
+// (e.g. fetch build details to discover artifacts, then download one).
+func (e *Executor) ExecuteRaw(ctx context.Context, req *Request) ([]byte, error) {
+	_, respBytes, err := e.doRequest(ctx, req)
+	return respBytes, err
+}
+
 // Execute performs the HTTP request described by req, formats the response,
 // and writes it to stdout.  Errors are returned as CLIErrors.
 func (e *Executor) Execute(ctx context.Context, req *Request) error {
+	resp, respBytes, err := e.doRequest(ctx, req)
+	if err != nil {
+		return err
+	}
+	return e.writeResponse(resp, respBytes, req)
+}
+
+// doRequest builds the URL, injects auth, executes the HTTP request (with
+// retries), and returns the response metadata and body bytes. It does NOT
+// print anything.
+func (e *Executor) doRequest(ctx context.Context, req *Request) (*http.Response, []byte, error) {
 	svcCfg, ok := e.cfg.Services[req.ServiceName]
 	if !ok {
-		return errs.NewConfigError(fmt.Sprintf("service %q not found in config", req.ServiceName))
+		return nil, nil, errs.NewConfigError(fmt.Sprintf("service %q not found in config", req.ServiceName))
 	}
 
 	baseURL := strings.TrimRight(svcCfg.BaseURL, "/")
 	if baseURL == "" {
-		return errs.NewConfigError(fmt.Sprintf("service %q: base_url is not set", req.ServiceName))
+		return nil, nil, errs.NewConfigError(fmt.Sprintf("service %q: base_url is not set", req.ServiceName))
 	}
 
 	// Substitute path parameters: /posts/{id}.json → /posts/123.json
 	path := req.PathTemplate
 	for k, v := range req.PathParams {
-		path = strings.ReplaceAll(path, "{"+k+"}", url.PathEscape(v))
+		path = strings.ReplaceAll(path, "{"+k+"}", escapePathParam(v))
+	}
+
+	// Jenkins jobs nested inside a view need /view/{view} prepended to
+	// /job/ paths so the Ingress routes them correctly.
+	if svcCfg.View != "" && strings.HasPrefix(path, "/job/") {
+		path = "/view/" + svcCfg.View + path
 	}
 
 	// Build full URL with query string
@@ -79,29 +104,47 @@ func (e *Executor) Execute(ctx context.Context, req *Request) error {
 		fullURL += "?" + q.Encode()
 	}
 
-	// Serialise request body
+	// Serialise request body. Jenkins POST/PUT endpoints use Stapler and
+	// require form-urlencoded with a json= wrapper; other services use JSON.
 	var bodyReader io.Reader
+	contentType := ""
+	isJenkins := req.ServiceName == "jenkins"
+	isMutating := req.Method != http.MethodGet && req.Method != http.MethodHead
 	if len(req.Body) > 0 {
 		b, err := json.Marshal(req.Body)
 		if err != nil {
-			return fmt.Errorf("marshal body: %w", err)
+			return nil, nil, fmt.Errorf("marshal body: %w", err)
 		}
-		bodyReader = bytes.NewReader(b)
+		if isJenkins && isMutating {
+			form := url.Values{}
+			form.Set("json", string(b))
+			bodyReader = bytes.NewReader([]byte(form.Encode()))
+			contentType = "application/x-www-form-urlencoded"
+		} else {
+			bodyReader = bytes.NewReader(b)
+			contentType = "application/json"
+		}
 	}
 
 	// Build HTTP request
 	httpReq, err := http.NewRequestWithContext(ctx, req.Method, fullURL, bodyReader)
 	if err != nil {
-		return fmt.Errorf("build request: %w", err)
+		return nil, nil, fmt.Errorf("build request: %w", err)
 	}
 	if bodyReader != nil {
-		httpReq.Header.Set("Content-Type", "application/json")
+		httpReq.Header.Set("Content-Type", contentType)
 	}
 	httpReq.Header.Set("Accept", "application/json")
 
 	// Inject auth credentials (Discourse: headers; Etherpad: ?apikey= query param).
-	// Done before dry-run output so the printed URL reflects the actual request.
 	auth.InjectAuth(httpReq, svcCfg, req.ServiceName)
+
+	// For mutating requests, attach a CSRF crumb if the service requires it.
+	if req.Method != http.MethodGet && req.Method != http.MethodHead {
+		if err = auth.AttachCrumb(ctx, httpReq, svcCfg, req.ServiceName); err != nil {
+			return nil, nil, classifyError(err)
+		}
+	}
 
 	// Log the outgoing request (after auth injection so the masked URL is accurate).
 	bodySize := 0
@@ -119,7 +162,7 @@ func (e *Executor) Execute(ctx context.Context, req *Request) error {
 			pretty, _ := json.MarshalIndent(req.Body, "", "  ")
 			fmt.Printf("Body:\n%s\n", pretty)
 		}
-		return nil
+		return nil, nil, nil
 	}
 
 	// Execute (with retry for transient network errors on idempotent methods)
@@ -127,11 +170,20 @@ func (e *Executor) Execute(ctx context.Context, req *Request) error {
 	resp, respBytes, err := e.doWithRetry(httpReq)
 	elapsed := time.Since(start)
 	if err != nil {
-		return classifyError(err)
+		return nil, nil, classifyError(err)
 	}
 
 	log.Debug("← %s (%d bytes, %dms)", resp.Status, len(respBytes), elapsed.Milliseconds())
 	log.Debug("response body: %s", log.FormatBody(respBytes, 3072))
+
+	return resp, respBytes, nil
+}
+
+// writeResponse formats and prints the HTTP response to stdout.
+func (e *Executor) writeResponse(resp *http.Response, respBytes []byte, req *Request) error {
+	if resp == nil {
+		return nil // dry-run
+	}
 
 	// Treat 4xx/5xx as API errors
 	if resp.StatusCode >= 400 {
@@ -142,9 +194,20 @@ func (e *Executor) Execute(ctx context.Context, req *Request) error {
 		return errs.NewAPIError(msg, nil)
 	}
 
-	// Empty body (e.g. 204 No Content)
+	// Empty body (e.g. 204 No Content, 201 Created)
 	if len(respBytes) == 0 {
-		fmt.Println("OK")
+		if loc := resp.Header.Get("Location"); loc != "" {
+			fmt.Println("Location:", loc)
+		} else {
+			fmt.Println("OK")
+		}
+		return nil
+	}
+
+	// Non-JSON responses (e.g. artifact downloads) — print raw content.
+	ct := resp.Header.Get("Content-Type")
+	if ct != "" && !strings.Contains(ct, "json") && !strings.Contains(ct, "html") {
+		fmt.Print(string(respBytes))
 		return nil
 	}
 
@@ -232,6 +295,13 @@ func classifyError(err error) error {
 		return errs.NewAPIError("request failed: "+masked, nil)
 	}
 	return errs.NewAPIError("request failed", err)
+}
+
+// escapePathParam is like url.PathEscape but preserves '/' so that
+// nested resource paths (e.g. Jenkins folder jobs like "folder/job/name")
+// work correctly in path parameter substitution.
+func escapePathParam(s string) string {
+	return strings.ReplaceAll(url.PathEscape(s), "%2F", "/")
 }
 
 func truncate(s string, n int) string {

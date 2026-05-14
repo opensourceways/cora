@@ -126,21 +126,30 @@ cora github issues get --owner cncf --repo cora --issue-number 1 --format json |
 # List all jobs
 cora jenkins jobs list
 
-# Get job details
-cora jenkins jobs get --name my-job
+# Get job details (nested folder jobs use /job/ path)
+cora jenkins jobs get --name "kubeconfig/job/get-temporary-kubeconfig"
 
-# Trigger a build
+# Trigger a simple build
 cora jenkins jobs build --name my-job
+
+# Trigger a parameterised build (pass build parameters via --data)
+cora jenkins jobs build --name "kubeconfig/job/get-temporary-kubeconfig" \
+  --data '{"parameter":[{"name":"NAMESPACE","value":"test-view"}]}'
 
 # Enable / disable a job
 cora jenkins jobs enable-job --name my-job
 cora jenkins jobs disable-job --name my-job
 
-# Delete a job
-cora jenkins jobs delete --name my-job
+# Get build details (includes artifacts list)
+cora jenkins builds get --name "kubeconfig/job/get-temporary-kubeconfig" --number 11
 
-# Get build details
-cora jenkins builds get --name my-job --number 1
+# Download a specific artifact
+cora jenkins builds download --name "kubeconfig/job/get-temporary-kubeconfig" \
+  --number 11 --filename "kubeconfig-test-view.yaml"
+
+# Download the first artifact (auto-discovers filename from build details)
+cora jenkins builds download --name "kubeconfig/job/get-temporary-kubeconfig" \
+  --number 11 --first
 
 # View the queue
 cora jenkins queue list
@@ -190,6 +199,10 @@ cora ships with built-in view definitions for common operations (field selection
 | forum | `topics get` | Vertical KV table |
 | forum | `posts list` | Horizontal table |
 | etherpad | `pads list` | Horizontal table |
+| jenkins | `jobs list` | Horizontal table |
+| jenkins | `jobs get` | Vertical KV table |
+| jenkins | `builds get` | Vertical KV table (with Artifacts) |
+| jenkins | `queue list` | Horizontal table |
 
 ### Setting up views.yaml
 
@@ -355,6 +368,9 @@ services:
   # ── Jenkins (built-in spec — no spec_url needed) ──
   jenkins:
     base_url: https://jenkins.example.com          # required; no default
+    # view is optional. When jobs are nested inside a View (e.g. ai-pipeline),
+    # setting this prepends /view/{view} to /job/ paths so requests pass Ingress routing.
+    view: ai-pipeline                              # optional
     auth:
       jenkins:
         username: "your-jenkins-username"

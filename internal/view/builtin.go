@@ -215,6 +215,14 @@ var builtinViews = map[string]map[string]ViewConfig{
 				{Field: "url", Label: "URL"},
 			},
 		},
+		"jobs/build": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "Queue ID"},
+				{Field: "task.name", Label: "Project"},
+				{Field: "why", Label: "Why"},
+				{Field: "inQueueSince", Label: "Waiting (ms)"},
+			},
+		},
 		"builds/get": {
 			Columns: []ViewColumn{
 				{Field: "number", Label: "No."},
@@ -224,6 +232,7 @@ var builtinViews = map[string]map[string]ViewConfig{
 				{Field: "duration", Label: "Duration (ms)"},
 				{Field: "timestamp", Label: "Timestamp", Format: FormatDate},
 				{Field: "url", Label: "URL"},
+				{Field: "artifacts", Label: "Artifacts", Format: FormatJSON},
 			},
 		},
 		"builds/progressive-log": {

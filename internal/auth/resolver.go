@@ -1,7 +1,11 @@
 package auth
 
 import (
+	"context"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/cncf/cora/internal/config"
@@ -72,4 +76,62 @@ func IsDiscourseAuthParam(name string) bool {
 // GitCode uses ?access_token= (PAT) and Authorization header (OAuth Bearer).
 func IsGitcodeAuthParam(name string) bool {
 	return name == "access_token" || name == "Authorization"
+}
+
+// AttachCrumb fetches a Jenkins CSRF crumb and attaches it as a header on the
+// request. Only acts when the service has Jenkins auth configured and the HTTP
+// method is not GET or HEAD (which don't require CSRF protection).
+//
+// The crumb is fetched from {baseURL}/crumbIssuer/api/json using Basic Auth.
+func AttachCrumb(ctx context.Context, req *http.Request, svc config.ServiceConfig, svcName string) error {
+	j := svc.Auth.Jenkins
+	if j == nil || j.Username == "" || j.APIToken == "" {
+		return nil
+	}
+	if req.Method == http.MethodGet || req.Method == http.MethodHead {
+		return nil
+	}
+
+	baseURL := svc.BaseURL
+	if baseURL == "" {
+		return nil
+	}
+	crumbURL := baseURL + "/crumbIssuer/api/json"
+
+	crumbReq, err := http.NewRequestWithContext(ctx, http.MethodGet, crumbURL, nil)
+	if err != nil {
+		return fmt.Errorf("jenkins crumb: build request: %w", err)
+	}
+	auth := base64.StdEncoding.EncodeToString([]byte(j.Username + ":" + j.APIToken))
+	crumbReq.Header.Set("Authorization", "Basic "+auth)
+
+	resp, err := http.DefaultClient.Do(crumbReq)
+	if err != nil {
+		return fmt.Errorf("jenkins crumb: fetch failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		return fmt.Errorf("jenkins crumb: server returned %d: %s", resp.StatusCode, string(body))
+	}
+
+	var crumb struct {
+		Crumb             string `json:"crumb"`
+		CrumbRequestField string `json:"crumbRequestField"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&crumb); err != nil {
+		return fmt.Errorf("jenkins crumb: parse response: %w", err)
+	}
+	if crumb.Crumb == "" {
+		return fmt.Errorf("jenkins crumb: empty crumb in response")
+	}
+
+	field := crumb.CrumbRequestField
+	if field == "" {
+		field = "Jenkins-Crumb"
+	}
+	req.Header.Set(field, crumb.Crumb)
+	log.Debug("auth: attached jenkins crumb for service %q", svcName)
+	return nil
 }

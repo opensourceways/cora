@@ -198,7 +198,7 @@ func pathSuffix(path string) string {
 }
 
 var knownVerbPrefixes = []string{
-	"list", "get", "create", "update", "patch", "delete",
+	"list", "get", "create", "update", "patch", "delete", "download",
 }
 
 // httpMethodSuffixes are the Java/Spring-Boot-style operationId suffixes that
@@ -407,6 +407,7 @@ func buildLeaf(
 	var params []paramRecord
 	var bodyFields []bodyRecord
 	dataFlag := new(string)
+	firstFlag := new(bool)
 	// registeredFlags tracks flag names already registered on this command to
 	// prevent panics when a spec declares the same parameter in both query and
 	// request body (e.g. GitCode's /oauth/token client_secret).
@@ -517,6 +518,12 @@ func buildLeaf(
 		}
 	}
 
+	// --first: download the first artifact (for endpoints with {filename} param)
+	hasFilenameParam := strings.Contains(pathTpl, "{filename}")
+	if hasFilenameParam {
+		cmd.Flags().BoolVar(firstFlag, "first", false, "download first artifact (auto-detects filename from build details)")
+	}
+
 	// ── RunE closure ─────────────────────────────────────────────────────────
 	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		// Read global persistent flags from root
@@ -563,6 +570,43 @@ func buildLeaf(
 
 		// Look up view config; nil means generic fallback rendering.
 		viewCfg := viewReg.Lookup(svcName, resource, verb)
+
+		// --first: auto-detect filename from build details
+		if *firstFlag && pathParams["filename"] == "" {
+			if dryRun {
+				fmt.Printf("[dry-run] would fetch build details to discover first artifact\n")
+			} else {
+				detailsPath := strings.Replace(pathTpl, "/artifact/{filename}", "/api/json", 1)
+				detailsParams := map[string]string{}
+				for k, v := range pathParams {
+					if k != "filename" {
+						detailsParams[k] = v
+					}
+				}
+				respBytes, err := exec.ExecuteRaw(context.Background(), &executor.Request{
+					ServiceName:  svcName,
+					PathTemplate: detailsPath,
+					Method:       "GET",
+					PathParams:   detailsParams,
+					Format:       "json",
+				})
+				if err != nil {
+					return fmt.Errorf("fetch build details for --first: %w", err)
+				}
+				var build struct {
+					Artifacts []struct {
+						RelativePath string `json:"relativePath"`
+					} `json:"artifacts"`
+				}
+				if err := json.Unmarshal(respBytes, &build); err != nil {
+					return fmt.Errorf("parse build details: %w", err)
+				}
+				if len(build.Artifacts) == 0 {
+					return fmt.Errorf("no artifacts found in build")
+				}
+				pathParams["filename"] = build.Artifacts[0].RelativePath
+			}
+		}
 
 		return exec.Execute(context.Background(), &executor.Request{
 			ServiceName:  svcName,
