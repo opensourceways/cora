@@ -10,5 +10,8 @@ config/config.yaml
 config/views.yaml
 config/smoke-config.yaml
 
+# Release artefacts
+dist/
+
 # Smoke test generated reports
 smoke-report/
