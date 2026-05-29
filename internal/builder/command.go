@@ -129,6 +129,9 @@ func Build(
 			// Same path: prefer GET so the read operation gets the clean verb
 			// (e.g. GET /issues/{n}/comments → "comments", not "comments-comments").
 			if ops[i].path == ops[j].path {
+				if ops[i].method == ops[j].method {
+					return false
+				}
 				if ops[i].method == "GET" {
 					return true
 				}
@@ -149,7 +152,8 @@ func Build(
 			// verbName (which treats the trailing segment as an "action"). For
 			// CLI ergonomics we want this to render as `<resource> list/create/…`,
 			// not `<resource> issues`. Re-derive purely from HTTP method.
-			if verb == res {
+			// Use TrimSuffix to handle singular/plural mismatches (e.g. "issue" vs "issues").
+			if strings.TrimSuffix(verb, "s") == strings.TrimSuffix(res, "s") {
 				verb = httpMethodVerb(e.method, e.path)
 			}
 			if verbSeen[verb] {
