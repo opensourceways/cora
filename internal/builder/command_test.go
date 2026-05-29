@@ -123,9 +123,15 @@ func TestVerbName_HTTPMethodFallback(t *testing.T) {
 		{"PUT", "/posts/{id}.json", "update"},
 		{"PATCH", "/posts/{id}.json", "update"},
 		{"DELETE", "/posts/{id}.json", "delete"},
-		// GitCode-style paths: mid-path params should not trigger "get" for collections.
-		{"GET", "/api/v5/repos/{owner}/{repo}/issues", "list"},
+		// GitCode-style deep paths: Priority 3 now handles up to 4 prior
+		// non-param segments (bumped from 2). The "issues" at the end of
+		// /api/v5/repos/{o}/{r}/issues is treated as a resource name;
+		// Build()'s verb==res override converts it to "list" for the final
+		// command.
+		{"GET", "/api/v5/repos/{owner}/{repo}/issues", "issues"},
 		{"GET", "/api/v5/repos/{owner}/{repo}/issues/{number}", "get"},
+		// Issue comments: action after {number} param
+		{"GET", "/api/v5/repos/{owner}/{repo}/issues/{number}/comments", "comments"},
 	}
 	for _, tc := range tests {
 		got := verbName("", tc.method, tc.path)

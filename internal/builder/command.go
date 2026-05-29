@@ -126,6 +126,19 @@ func Build(
 			if ri != rj {
 				return ri
 			}
+			// Same path: prefer GET so the read operation gets the clean verb
+			// (e.g. GET /issues/{n}/comments → "comments", not "comments-comments").
+			if ops[i].path == ops[j].path {
+				if ops[i].method == ops[j].method {
+					return false
+				}
+				if ops[i].method == "GET" {
+					return true
+				}
+				if ops[j].method == "GET" {
+					return false
+				}
+			}
 			return ops[i].path < ops[j].path
 		})
 
@@ -139,7 +152,8 @@ func Build(
 			// verbName (which treats the trailing segment as an "action"). For
 			// CLI ergonomics we want this to render as `<resource> list/create/…`,
 			// not `<resource> issues`. Re-derive purely from HTTP method.
-			if verb == res {
+			// Use TrimSuffix to handle singular/plural mismatches (e.g. "issue" vs "issues").
+			if strings.TrimSuffix(verb, "s") == strings.TrimSuffix(res, "s") {
 				verb = httpMethodVerb(e.method, e.path)
 			}
 			if verbSeen[verb] {
@@ -247,9 +261,8 @@ func verbName(opID, method, path string) string {
 	}
 
 	// Priority 3: action segment after a path param: /posts/{id}/lock.json → "lock"
-	// Only applies to shallow paths (at most 2 non-param segments before the
-	// {param}/action pair). Deep API paths like /api/v5/repos/{owner}/{repo}/issues
-	// have resource names at the end, not actions, and must fall through to Priority 4.
+	// Applies when up to 4 non-param segments precede the {param}/action pair
+	// (tolerance for versioned API paths like /api/v5/repos/.../issues/{number}/comments).
 	clean := strings.TrimSuffix(path, ".json")
 	segs := strings.Split(strings.Trim(clean, "/"), "/")
 	if len(segs) >= 2 {
@@ -264,8 +277,8 @@ func verbName(opID, method, path string) string {
 					priorNonParam++
 				}
 			}
-			if priorNonParam <= 2 {
-				return last // e.g. "replies", "lock"
+			if priorNonParam <= 4 {
+				return last // e.g. "replies", "lock", "comments"
 			}
 		}
 	}

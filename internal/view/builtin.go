@@ -27,6 +27,15 @@ var builtinViews = map[string]map[string]ViewConfig{
 				{Field: "created_at", Label: "Created", Format: FormatDate, Width: 12},
 			},
 		},
+		"issues/comments": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "ID", Width: 8},
+				{Field: "user.login", Label: "Author", Width: 18},
+				{Field: "body", Label: "Body", Format: FormatMultiline, Truncate: 160, Width: 56},
+				{Field: "created_at", Label: "Created", Format: FormatDate, Width: 12},
+				{Field: "updated_at", Label: "Updated", Format: FormatDate, Width: 12},
+			},
+		},
 		"repos/get": {
 			Columns: []ViewColumn{
 				{Field: "full_name", Label: "Repo"},
@@ -93,6 +102,15 @@ var builtinViews = map[string]map[string]ViewConfig{
 				{Field: "state", Label: "State", Width: 8},
 				{Field: "user.login", Label: "Author", Width: 18},
 				{Field: "created_at", Label: "Created", Format: FormatDate, Width: 12},
+			},
+		},
+		"issues/comments": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "ID", Width: 8},
+				{Field: "user.login", Label: "Author", Width: 18},
+				{Field: "body", Label: "Body", Format: FormatMultiline, Truncate: 160, Width: 56},
+				{Field: "created_at", Label: "Created", Format: FormatDate, Width: 12},
+				{Field: "updated_at", Label: "Updated", Format: FormatDate, Width: 12},
 			},
 		},
 		"repos/get": {
