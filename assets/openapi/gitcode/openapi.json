@@ -18198,7 +18198,7 @@
         "summary": "创建Issue评论",
         "deprecated": false,
         "description": "",
-        "operationId": "post_api_v5_repos_{owner}_{repo}_issues_{number}_comments",
+        "operationId": "createIssueComment",
         "tags": [
           "Issues"
         ],
@@ -18408,7 +18408,7 @@
         "summary": "获取仓库所有 Issue 评论",
         "deprecated": false,
         "description": "",
-        "operationId": "get_api_v5_repos_{owner}_{repo}_issues_comments ",
+        "operationId": "get_api_v5_repos_{owner}_{repo}_issues_comments",
         "tags": [
           "Issues"
         ],
