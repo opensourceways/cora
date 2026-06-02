@@ -1,13 +1,18 @@
 package builder
 
 import (
+	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/spf13/cobra"
 
+	"github.com/cncf/cora/assets"
 	"github.com/cncf/cora/internal/config"
 	"github.com/cncf/cora/internal/executor"
+	"github.com/cncf/cora/internal/spec"
 	"github.com/cncf/cora/internal/view"
 )
 
@@ -282,6 +287,68 @@ func TestPathSuffix(t *testing.T) {
 }
 
 // ── Build: Etherpad deduplication ────────────────────────────────────────────
+
+func loadEmbeddedSpec(t *testing.T, svcName string, data []byte) *cobra.Command {
+	t.Helper()
+	loader := spec.NewEmbeddedLoader(svcName, data, t.TempDir(), 1*time.Hour)
+	s, err := loader.Load(context.Background())
+	if err != nil {
+		t.Fatalf("failed to load %s spec: %v", svcName, err)
+	}
+	cfg := &config.Config{Services: map[string]config.ServiceConfig{svcName: {BaseURL: "http://x"}}}
+	return Build(svcName, s, cfg, executor.New(cfg), view.NewRegistry())
+}
+
+func TestBuild_GitCodeUserCommands(t *testing.T) {
+	// Verify that the GitCode OpenAPI spec produces correct user command names.
+	// Regression test for issue where GET repos/{o}/{r} was incorrectly tagged
+	// "Users", stealing the clean "get" verb from GET users/{username}.
+	cmd := loadEmbeddedSpec(t, "gitcode", assets.GitcodeSpec)
+
+	for _, resCmd := range cmd.Commands() {
+		if resCmd.Use != "users" {
+			continue
+		}
+		verbs := map[string]string{}
+		for _, leaf := range resCmd.Commands() {
+			verbs[leaf.Use] = leaf.Short
+		}
+		if summary, ok := verbs["get"]; !ok {
+			t.Error("'users get' command not found (expected 获取一个用户)")
+		} else if summary == "" || strings.Contains(summary, "仓库") {
+			t.Errorf("'users get' has wrong summary: %q (expected user-related)", summary)
+		}
+		if summary, ok := verbs["list-user"]; !ok {
+			t.Error("'users list-user' command not found (expected 获取授权用户的资料)")
+		} else if summary == "" {
+			t.Errorf("'users list-user' has empty summary")
+		}
+		return
+	}
+	t.Error("'users' resource command not found")
+}
+
+func TestBuild_GitHubUserCommands(t *testing.T) {
+	cmd := loadEmbeddedSpec(t, "github", assets.GithubSpec)
+
+	for _, resCmd := range cmd.Commands() {
+		if resCmd.Use != "users" {
+			continue
+		}
+		verbs := map[string]string{}
+		for _, leaf := range resCmd.Commands() {
+			verbs[leaf.Use] = leaf.Short
+		}
+		if _, ok := verbs["get"]; !ok {
+			t.Error("'users get' command not found")
+		}
+		if _, ok := verbs["list-user"]; !ok {
+			t.Error("'users list-user' command not found")
+		}
+		return
+	}
+	t.Error("'users' resource command not found")
+}
 
 func TestBuild_EtherpadStyle_DeduplicatesGetPost(t *testing.T) {
 	getOp := openapi3.NewOperation()

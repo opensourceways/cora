@@ -130,8 +130,11 @@ func TestVerbName_HTTPMethodFallback(t *testing.T) {
 		// command.
 		{"GET", "/api/v5/repos/{owner}/{repo}/issues", "issues"},
 		{"GET", "/api/v5/repos/{owner}/{repo}/issues/{number}", "get"},
-		// Issue comments: action after {number} param
+		// Issue comments: action after {number} param.
 		{"GET", "/api/v5/repos/{owner}/{repo}/issues/{number}/comments", "comments"},
+		// User endpoints.
+		{"GET", "/api/v5/user", "list"},
+		{"GET", "/api/v5/users/{username}", "get"},
 	}
 	for _, tc := range tests {
 		got := verbName("", tc.method, tc.path)
