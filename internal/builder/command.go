@@ -162,12 +162,24 @@ func Build(
 				if ctx != "" && ctx != "repo" {
 					verb = verb + "-" + ctx
 				} else {
-					verb = verb + "-" + pathSuffix(e.path)
+					suffix := pathSuffix(e.path)
+					if suffix == verb {
+						// suffix equals verb means we're on a sub-resource
+						// like .../{number}/assignees — use HTTP method.
+						suffix = httpMethodVerb(e.method, e.path)
+					}
+					verb = verb + "-" + suffix
 				}
 			}
 			// Second try: if still conflicts, append path suffix on top.
+			// If suffix equals the original verb, use HTTP method instead
+			// to avoid e.g. "assignees" → "assignees-assignees".
 			if verbSeen[verb] {
-				verb = verb + "-" + pathSuffix(e.path)
+				suffix := pathSuffix(e.path)
+				if suffix == verb {
+					suffix = httpMethodVerb(e.method, e.path)
+				}
+				verb = verb + "-" + suffix
 			}
 			verbSeen[verb] = true
 

@@ -23254,7 +23254,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -24191,7 +24191,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -25780,7 +25780,7 @@
         "description": "",
         "operationId": "put_api_v5_repos_{owner}_{repo}_pulls_{number}_merge",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -25884,7 +25884,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_merge",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -25958,7 +25958,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_issues",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -26138,7 +26138,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_linked_issues",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -26269,7 +26269,7 @@
         "description": "",
         "operationId": "delete_api_v5_repos_{owner}_{repo}_pulls_{number}_issues",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -26402,7 +26402,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_comments",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -26505,7 +26505,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_comments",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -26746,7 +26746,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_files",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -26987,7 +26987,7 @@
         "description": "",
         "operationId": "patch_api_v5_repos_{owner}_{repo}_pulls_{number}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -27115,7 +27115,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -27963,7 +27963,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_commits",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28189,7 +28189,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_labels",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28298,7 +28298,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_labels",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28419,7 +28419,7 @@
         "description": "",
         "operationId": "put_api_v5_repos_{owner}_{repo}_pulls_{number}_labels",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28500,7 +28500,7 @@
         "description": "",
         "operationId": "delete_api_v5_repos_{owner}_{repo}_pulls_{number}_labels_{name}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28577,7 +28577,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_test",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28660,7 +28660,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_review",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28743,7 +28743,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_operate_logs",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -28982,7 +28982,7 @@
         "description": "",
         "operationId": "patch_api_v5_repos_{owner}_{repo}_pulls_{number}_testers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29063,7 +29063,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_testers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29189,7 +29189,7 @@
         "description": "",
         "operationId": "delete_api_v5_repos_{owner}_{repo}_pulls_{number}_testers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29306,7 +29306,7 @@
         "description": "",
         "operationId": "patch_api_v5_repos_{owner}_{repo}_pulls_{number}_assignees",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29387,7 +29387,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_assignees",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29478,7 +29478,7 @@
         "description": "",
         "operationId": "delete_api_v5_repos_{owner}_{repo}_pulls_{number}_assignees",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29555,7 +29555,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_files.json",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -29978,7 +29978,7 @@
         "description": "",
         "operationId": "get_{owner}_{repo}_raw_{head_sha}_{name}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -30047,7 +30047,7 @@
         "description": "",
         "operationId": "get_api_v5_enterprises_{enterprise}_pull_requests",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -30489,7 +30489,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_comments_{id}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -30675,7 +30675,7 @@
         "description": "",
         "operationId": "patch_api_v5_repos_{owner}_{repo}_pulls_comments_{id}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -30760,7 +30760,7 @@
         "description": "",
         "operationId": "delete_api_v5_repos_{owner}_{repo}_pulls_comments_{id}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -30828,7 +30828,7 @@
         "description": "",
         "operationId": "get_api_v5_org_{org}_pull_requests",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -31178,7 +31178,7 @@
         "description": "",
         "operationId": "get_api_v5_enterprises_{enterprise}_issues_{number}_pull_requests",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -31809,7 +31809,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_discussions_{discussions_id}_comments",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -31922,7 +31922,7 @@
         "description": "",
         "operationId": "put_api_v5_repos_{owner}_{repo}_pulls_{number}_comments_{discussions_id}",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32020,7 +32020,7 @@
         "description": "",
         "operationId": "post_api_v5_repos_{owner}_{repo}_pulls_{number}_approval_reviewers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32141,7 +32141,7 @@
         "description": "",
         "operationId": "delete_api_v5_repos_{owner}_{repo}_pulls_{number}_approval_reviewers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32258,7 +32258,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_option_approval_reviewers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32354,7 +32354,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_option_approval_testers",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32440,7 +32440,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_user_reactions",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32579,7 +32579,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_comment_{comment_id}_user_reactions",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32718,7 +32718,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_{number}_modify_history",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
@@ -32869,7 +32869,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_pulls_comment_{comment_id}_modify_history",
         "tags": [
-          "Pull Requests"
+          "Pulls"
         ],
         "parameters": [
           {
