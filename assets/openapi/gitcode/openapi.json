@@ -1628,7 +1628,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}",
         "tags": [
-          "Users"
+          "Repositories"
         ],
         "parameters": [
           {
@@ -11156,7 +11156,7 @@
         "description": "",
         "operationId": "get_api_v5_repos_{owner}_{repo}_notifications",
         "tags": [
-          "Users"
+          "Repositories"
         ],
         "parameters": [
           {
@@ -11348,7 +11348,7 @@
         "description": "",
         "operationId": "put_api_v5_repos_{owner}_{repo}_notifications",
         "tags": [
-          "Users"
+          "Repositories"
         ],
         "parameters": [
           {
