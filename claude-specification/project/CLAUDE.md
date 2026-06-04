@@ -66,10 +66,18 @@ cora/
 ### 命令生成机制
 
 - 命令树在运行时从 OpenAPI Spec 动态生成，**不手写具体 API 命令**
-- 资源名 = 操作的第一个 tag（小写 kebab-case）
-- 动词按优先级派生：`UsingGET` 后缀 → 已知动词前缀 → path 结构 → HTTP method fallback
-- GitCode 风格的 path-encoded operationId（`get_api_v5_*`）跳过 Priority 2，使用 HTTP method fallback
-- 同一 resource 下动词冲突时，按 pathContext + 路径深度排序后追加后缀消歧
+- 资源名由三层推导（详见 `spec/spec-optimization-design.md`）：
+  1. **Path 优先**：path 中有明确子资源段（如 `/pulls/`、`/issues/`）的，优先采用 path 信号
+  2. **Tag 规范化**：对 tag 做归一化（与 path 交叉验证、同义词映射、单复数统一）
+  3. **Fallback**：path 最后非参数段
+- 动词派生优先级（6 级）：
+  1. `Using{METHOD}` 后缀（Etherpad/Spring-Boot 风格）
+  2. 已知动词前缀（`list`、`get`、`create`…），GitCode path-encoded opId 跳过此级
+  2.5 **新增**：path-encoded opId（GitCode 风格）提取 HTTP method 前缀恢复动词信号
+  3. path param 后的动作段：`/{id}/comments` → `comments`
+  4. HTTP method + trailing param 推断：GET 无尾参 → `list`，有尾参 → `get`
+- Verb==resource 覆盖：verb 和 resource 单复数一致时，重新派生为 `list`/`get`/`create`…
+- 同一 resource 下动词冲突时：pathContext → pathSuffix（suffix≠verb）→ HTTP method
 
 ### 认证机制
 
@@ -86,6 +94,37 @@ cora/
 |------|--------|--------------|
 | GitCode | `gitcode` | `https://api.gitcode.com` |
 | Etherpad | `etherpad` | `https://etherpad.openeuler.org/api/1.3.0` |
+
+### OpenAPI Spec 编写规范
+
+添加新服务或在现有 spec 中新增端点时，遵循以下规范以减少命令生成偏差：
+
+**Tag 规范**
+- 使用单数或复数**短名词**，避免多词组合：`Pulls` 而非 `Pull Requests`
+- 与 GitHub API 保持一致命名：`pulls` / `issues` / `users` / `repos` / `orgs`
+- 每个 operation 只标一个 tag（第一个 tag 用作资源名）
+- Tag 含义应与 REST 资源概念一致，**不应跨资源**
+
+**路径与 Tag 的对应关系**
+- 路径以 `repos/{o}/{r}/...` 开头 → tag 为 `Repositories`
+- 路径含 `repos/{o}/{r}/pulls/...` → tag 为 `Pulls`（不是 Repositories）
+- 路径含 `repos/{o}/{r}/issues/...` → tag 为 `Issues`（不是 Repositories）
+- 路径不含特定子资源段 → 使用通用资源 tag
+
+**Tag 命名对照表**（GitCode ↔ GitHub 统一）
+
+| 概念 | 推荐 Tag | 避免 |
+|------|---------|------|
+| PR | `Pulls` | `Pull Requests` |
+| Issue | `Issues` | - |
+| 仓库 | `Repositories` | `Repos`（GitHub用此名）|
+| 组织 | `Organizations` | `Orgs` |
+| 用户 | `Users` | - |
+| 分支 | `Branch` | `Branches` |
+| 标签 | `Labels` | - |
+| 里程碑 | `Milestone` | `Milestones` |
+| 发布 | `Release` | `Releases` |
+| Webhook | `Webhooks` | - |
 
 ---
 

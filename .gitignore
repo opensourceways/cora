@@ -15,3 +15,4 @@ dist/
 
 # Smoke test generated reports
 smoke-report/
+.playwright-mcp/

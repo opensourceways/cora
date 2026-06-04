@@ -66,6 +66,9 @@ func Build(
 			if shouldDeduplicateMethods(ops) {
 				if getOp, ok := ops[http.MethodGet]; ok && getOp != nil {
 					res := resourceName(getOp, path)
+					if pathRes := resourceFromPath(path); pathRes != "" && pathRes != res {
+						res = pathRes
+					}
 					resources[res] = append(resources[res], opEntry{path, http.MethodGet, getOp})
 					continue
 				}
@@ -75,6 +78,14 @@ func Build(
 					continue
 				}
 				res := resourceName(op, path)
+				// Path-priority: if the path contains a strong sub-resource
+				// signal (e.g. /repos/.../issues/...) that differs from the
+				// tag-derived resource, prefer the path signal. This protects
+				// against mis-tagged operations (e.g. a repo-scoped endpoint
+				// incorrectly tagged "Users").
+				if pathRes := resourceFromPath(path); pathRes != "" && pathRes != res {
+					res = pathRes
+				}
 				resources[res] = append(resources[res], opEntry{path, method, op})
 			}
 		}
@@ -196,12 +207,96 @@ func Build(
 // ─── Name derivation ─────────────────────────────────────────────────────────
 
 // resourceName returns the CLI resource name for an operation.
-// Uses the first tag (e.g. "Posts" → "posts"); falls back to path analysis.
+// Uses tag → path-validated normalization → path fallback.
 func resourceName(op *openapi3.Operation, path string) string {
 	if len(op.Tags) > 0 {
-		return strings.ToLower(strings.ReplaceAll(op.Tags[0], " ", "-"))
+		return normalizeTag(op.Tags[0], path)
 	}
 	return lastPathSegment(path)
+}
+
+// normalizeTag converts a human-readable tag into a CLI resource name.
+//
+// Strategy:
+//  1. Kebab-case the tag.
+//  2. Cross-reference with path segments — if the path contains a shorter
+//     synonym (e.g. "pulls" vs "pull-requests"), prefer the path form.
+func normalizeTag(tag, path string) string {
+	candidate := strings.ToLower(strings.ReplaceAll(tag, " ", "-"))
+
+	// Cross-reference: does the path contain a preferred short synonym?
+	pathSegs := strings.Split(strings.Trim(path, "/"), "/")
+	for _, s := range pathSegs {
+		sl := strings.ToLower(s)
+		if sl == "" || strings.HasPrefix(sl, "{") || sl == "api" || len(sl) < 2 {
+			continue
+		}
+		// Skip version segments (v5, v1, etc.)
+		if len(sl) >= 2 && sl[0] == 'v' && isDigit(sl[1]) {
+			continue
+		}
+		if isShortSynonym(sl, candidate) {
+			return sl
+		}
+	}
+
+	return candidate
+}
+
+// isShortSynonym checks whether pathWord is a clearly preferred shorter
+// equivalent of tagWord (e.g. "pulls" over "pull-requests"). Returns false
+// when pathWord is merely the singular form of the tag (e.g. "user" vs "users").
+func isShortSynonym(pathWord, tagWord string) bool {
+	if pathWord == tagWord {
+		return false // identical, no preference
+	}
+	// Known synonym pairs: path form is preferred over tag form.
+	synonyms := map[string]string{
+		"pulls":          "pull-requests",
+		"pull-requests":  "pulls",
+		"repos":          "repositories",
+		"repositories":   "repos",
+		"orgs":           "organizations",
+		"organizations":  "orgs",
+	}
+	if v, ok := synonyms[pathWord]; ok && v == tagWord {
+		return true
+	}
+	return false
+}
+
+// isDigit reports whether b is an ASCII digit.
+func isDigit(b byte) bool { return b >= '0' && b <= '9' }
+
+// resourceFromPath extracts a strong resource signal from the path structure.
+// Returns "" if no clear signal exists.
+//
+// Recognized sub-resource segments that indicate the operation belongs to
+// a different resource group than the parent path suggests:
+//
+//	/repos/{o}/{r}/issues/...   → "issues"
+//	/repos/{o}/{r}/pulls/...    → "pulls"
+//	/repos/{o}/{r}/branches/... → "branch"
+func resourceFromPath(path string) string {
+	subResources := map[string]string{
+		"issues":        "issues",
+		"pulls":         "pulls",
+		"branches":      "branch",
+		"labels":        "labels",
+		"comments":      "comments",
+		"milestones":    "milestone",
+		"releases":      "release",
+		"members":       "member",
+		"collaborators": "member",
+		"webhooks":      "webhooks",
+	}
+	segs := strings.Split(strings.Trim(path, "/"), "/")
+	for _, s := range segs {
+		if res, ok := subResources[strings.ToLower(s)]; ok {
+			return res
+		}
+	}
+	return ""
 }
 
 // lastPathSegment returns the last non-parameter path segment, without .json.
@@ -243,12 +338,13 @@ var httpMethodSuffixes = []string{
 //  2. Known verb prefix in a plain camelCase operationId (REST style):
 //     e.g. "listPosts" → "list"
 //     Skipped for path-encoded operationIds (GitCode style: get_api_v5_…)
-//     because those are better resolved by the HTTP-method fallback.
 //  3. Action segment after a path param: /{id}/lock.json → "lock"
+//     Applies when up to 4 non-param segments precede the {param}/action pair.
+//  3.5 For path-encoded operationIds (GitCode style), extract the HTTP
+//     method prefix to recover the lost verb signal. This runs after
+//     Priority 3 so action segments (e.g. "assignees") take precedence
+//     over the generic method-based verb.
 //  4. HTTP method + trailing-param check → "get" / "list" / "create" etc.
-//     Uses trailing-param detection so /repos/{owner}/{repo}/issues (no
-//     trailing param) yields "list", while /repos/{owner}/{repo}/issues/{n}
-//     (trailing param) yields "get".
 func verbName(opID, method, path string) string {
 	// Priority 1: strip Java-style Using{METHOD} suffix and use full kebab name.
 	for _, suffix := range httpMethodSuffixes {
@@ -291,6 +387,29 @@ func verbName(opID, method, path string) string {
 			}
 			if priorNonParam <= 4 {
 				return last // e.g. "replies", "lock", "comments"
+			}
+		}
+	}
+
+	
+// Priority 3.5: for path-encoded operationIds (GitCode style), extract
+	// the HTTP method prefix to recover the lost verb signal.
+	// e.g. "get_api_v5_user" -> "get" (or "list" if no trailing param).
+	if isPathEncodedOpID(opID) {
+		parts := strings.SplitN(strings.ToLower(opID), "_", 2)
+		if len(parts) > 0 {
+			switch parts[0] {
+			case "get":
+				if hasTrailingParam(path) {
+					return "get"
+				}
+				return "list"
+			case "post":
+				return "create"
+			case "put", "patch":
+				return "update"
+			case "delete":
+				return "delete"
 			}
 		}
 	}
