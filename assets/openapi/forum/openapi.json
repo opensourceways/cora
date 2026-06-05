@@ -17,7 +17,7 @@
       "get": {
         "summary": "List calendar events",
         "tags": [
-          "Discourse Calendar - Events"
+          "Calendar Events"
         ],
         "operationId": "listEvents",
         "parameters": [
@@ -477,7 +477,7 @@
       "get": {
         "summary": "Export calendar events in iCalendar format",
         "tags": [
-          "Discourse Calendar - Events"
+          "Calendar Events"
         ],
         "operationId": "exportEventsICS",
         "parameters": [
@@ -5910,7 +5910,7 @@
         "tags": [
           "Posts",
           "Topics",
-          "Private Messages"
+          "Messages"
         ],
         "operationId": "createTopicPostPM",
         "parameters": [],
@@ -7748,7 +7748,7 @@
       "get": {
         "summary": "Get a list of private messages for a user",
         "tags": [
-          "Private Messages"
+          "Messages"
         ],
         "operationId": "listUserPrivateMessages",
         "parameters": [
@@ -7993,7 +7993,7 @@
       "get": {
         "summary": "Get a list of private messages sent for a user",
         "tags": [
-          "Private Messages"
+          "Messages"
         ],
         "operationId": "getUserSentPrivateMessages",
         "parameters": [

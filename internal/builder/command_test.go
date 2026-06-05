@@ -24,11 +24,67 @@ func TestResourceName_usesFirstTag(t *testing.T) {
 		{[]string{"Posts"}, "/posts.json", "posts"},
 		{[]string{"Mail Threads"}, "/threads", "mail-threads"},
 		{[]string{"ISSUES"}, "/issues", "issues"},
+		// Tag normalization: path has a preferred short synonym.
+		{[]string{"Pull Requests"}, "/api/v5/repos/{o}/{r}/pulls", "pulls"},
+		{[]string{"Pull Requests"}, "/api/v5/enterprises/{e}/pull_requests", "pull-requests"},
+		// Simple tags are unchanged.
+		{[]string{"Pulls"}, "/api/v5/repos/{o}/{r}/pulls/{n}", "pulls"},
+		{[]string{"Users"}, "/user", "users"},
+		{[]string{"Users"}, "/api/v5/user", "users"},
 	}
 	for _, tc := range tests {
 		got := resourceName(newOp(tc.tags), tc.path)
 		if got != tc.want {
 			t.Errorf("resourceName(tags=%v, path=%q) = %q, want %q", tc.tags, tc.path, got, tc.want)
+		}
+	}
+}
+
+func TestIsShortSynonym(t *testing.T) {
+	tests := []struct {
+		pathWord, tagWord string
+		want              bool
+	}{
+		{"pulls", "pull-requests", true},
+		{"pull-requests", "pulls", true},
+		{"repos", "repositories", true},
+		{"orgs", "organizations", true},
+		// Not synonyms: just singular/plural of same word.
+		{"user", "users", false},
+		{"issue", "issues", false},
+		{"repo", "repos", false},
+		// Same word.
+		{"pulls", "pulls", false},
+	}
+	for _, tc := range tests {
+		got := isShortSynonym(tc.pathWord, tc.tagWord)
+		if got != tc.want {
+			t.Errorf("isShortSynonym(%q, %q) = %v, want %v", tc.pathWord, tc.tagWord, got, tc.want)
+		}
+	}
+}
+
+func TestResourceFromPath(t *testing.T) {
+	tests := []struct {
+		path string
+		want string
+	}{
+		{"/repos/{o}/{r}/issues", "issues"},
+		{"/repos/{o}/{r}/issues/{n}/comments", "issues"},
+		{"/repos/{o}/{r}/pulls", "pulls"},
+		{"/api/v5/repos/{o}/{r}/pulls/{n}/assignees", "pulls"},
+		{"/repos/{o}/{r}/branches", "branch"},
+		{"/repos/{o}/{r}/labels", "labels"},
+		{"/repos/{o}/{r}/milestones", "milestone"},
+		// No sub-resource signal.
+		{"/repos/{o}/{r}", ""},
+		{"/user", ""},
+		{"/api/v5/user", ""},
+	}
+	for _, tc := range tests {
+		got := resourceFromPath(tc.path)
+		if got != tc.want {
+			t.Errorf("resourceFromPath(%q) = %q, want %q", tc.path, got, tc.want)
 		}
 	}
 }
@@ -62,6 +118,8 @@ func TestLastPathSegment(t *testing.T) {
 		{"/", "root"},
 		{"/{id}", "root"},
 		{"/v1/topics/{id}/posts", "posts"},
+		// Underscores normalized to hyphens.
+		{"/api/v5/repos/{o}/{r}/pulls/option_testers", "option-testers"},
 	}
 	for _, tc := range tests {
 		got := lastPathSegment(tc.path)
@@ -204,6 +262,14 @@ func TestPathContext(t *testing.T) {
 		{"/api/v5/user/issues", "user"},
 		{"/api/v5/orgs/{org}/issues", "org"},
 		{"/posts/{id}.json", "post"},
+		// .json suffix is stripped before analysis.
+		{"/posts.json", "post"},
+		// Single-letter segments (e.g. "t", "u" in Discourse) are skipped.
+		{"/t/{id}.json", ""},
+		{"/u/{username}.json", ""},
+		{"/u/by-external/{id}.json", "by-external"},
+		// Underscores are normalized to hyphens.
+		{"/post_actions.json", "post-action"},
 	}
 	for _, tc := range tests {
 		got := pathContext(tc.path)
