@@ -1,4 +1,4 @@
-name: "Etherpad · pad list all"
+name: "etherpad/pad-list"
 service: etherpad
 args:
   - pad

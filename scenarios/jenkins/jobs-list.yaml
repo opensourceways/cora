@@ -1,4 +1,4 @@
-name: "Jenkins · jobs list"
+name: "jenkins/jobs-list"
 service: jenkins
 args:
   - jobs

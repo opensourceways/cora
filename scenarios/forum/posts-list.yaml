@@ -1,4 +1,4 @@
-name: "Forum · posts list"
+name: "forum/posts-list"
 service: forum
 args:
   - posts
