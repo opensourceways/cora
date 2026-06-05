@@ -36,6 +36,8 @@ jobs:
           SMOKE_FORUM_API_KEY: ${{ secrets.SMOKE_FORUM_API_KEY }}
           SMOKE_FORUM_USERNAME: ${{ secrets.SMOKE_FORUM_USERNAME }}
           SMOKE_ETHERPAD_URL: ${{ secrets.SMOKE_ETHERPAD_URL }}
+          SMOKE_EUR_USERNAME: ${{ secrets.SMOKE_EUR_USERNAME }}
+          SMOKE_EUR_API_TOKEN: ${{ secrets.SMOKE_EUR_API_TOKEN }}
           SMOKE_ETHERPAD_API_KEY: ${{ secrets.SMOKE_ETHERPAD_API_KEY }}
         run: |
           ./bin/smoke-runner \

@@ -25,3 +25,9 @@ var GithubSpec []byte
 //
 //go:embed openapi/jenkins/openapi.json
 var JenkinsSpec []byte
+
+// EURSpec is the OpenAPI spec for the openEuler Copr (EUR) build service,
+// embedded at build time from assets/openapi/eur/openapi.json.
+//
+//go:embed openapi/eur/openapi.json
+var EURSpec []byte

@@ -62,6 +62,12 @@ func InjectAuth(req *http.Request, svc config.ServiceConfig, svcName string) {
 		req.Header.Set("Authorization", "Basic "+auth)
 		log.Debug("auth: injecting jenkins basic auth for service %q", svcName)
 	}
+
+	if e := svc.Auth.EUR; e != nil && e.Username != "" && e.APIToken != "" {
+		auth := base64.StdEncoding.EncodeToString([]byte(e.Username + ":" + e.APIToken))
+		req.Header.Set("Authorization", "Basic "+auth)
+		log.Debug("auth: injecting eur basic auth for service %q", svcName)
+	}
 }
 
 // IsDiscourseAuthParam reports whether an OpenAPI parameter is one of the

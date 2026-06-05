@@ -13,6 +13,7 @@ const (
 	gitcodeName  = "gitcode"
 	githubName   = "github"
 	jenkinsName  = "jenkins"
+	eurName      = "eur"
 )
 
 // registerBuiltins adds built-in service entries to the registry and ensures
@@ -53,6 +54,13 @@ func registerBuiltins(r *Registry, cfg *config.Config) {
 	addBuiltin(r, cfg, builtinDef{
 		name:     jenkinsName,
 		specData: assets.JenkinsSpec,
+		cacheDir: cacheDir,
+		ttl:      ttl,
+	})
+
+	addBuiltin(r, cfg, builtinDef{
+		name:     eurName,
+		specData: assets.EURSpec,
 		cacheDir: cacheDir,
 		ttl:      ttl,
 	})

@@ -1,0 +1,556 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Copr API",
+    "version": "v3",
+    "description": "See python client - <https://python-copr.readthedocs.io>"
+  },
+  "paths": {
+    "/build/{build_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Build"
+            }
+          }
+        },
+        "summary": "Get a build",
+        "description": "Get details for a single Copr build.",
+        "operationId": "get_get_build",
+        "parameters": [
+          {
+            "name": "build_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Numeric ID"
+          }
+        ],
+        "tags": [
+          "build"
+        ]
+      }
+    },
+    "/package/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Package"
+            }
+          }
+        },
+        "summary": "Get a package",
+        "description": "Get a single package from a Copr project.",
+        "operationId": "get_get_package",
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "User or group name"
+          },
+          {
+            "name": "projectname",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Name of the project"
+          },
+          {
+            "name": "packagename",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Name of the package"
+          },
+          {
+            "name": "with_latest_build",
+            "in": "query",
+            "type": "boolean",
+            "description": "The result will contain 'builds' dictionary with the latest submitted build of this particular package within the project",
+            "default": false
+          },
+          {
+            "name": "with_latest_succeeded_build",
+            "in": "query",
+            "type": "boolean",
+            "description": "The result will contain 'builds' dictionary with the latest successful build of this particular package within the project.",
+            "default": false
+          }
+        ],
+        "tags": [
+          "package"
+        ]
+      }
+    },
+    "/package/add/{ownername}/{projectname}/{package_name}/{source_type_text}": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Package"
+            }
+          }
+        },
+        "summary": "Create a package",
+        "description": "Create a new package inside a specified Copr project.\n\nSee what fields are required for which source types:\nhttps://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+        "operationId": "post_package_add",
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "User or group name"
+          },
+          {
+            "name": "projectname",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Name of the project"
+          },
+          {
+            "name": "package_name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Name of the package"
+          },
+          {
+            "name": "source_type_text",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html"
+          }
+        ],
+        "tags": [
+          "package"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone_url": {
+                    "type": "string"
+                  },
+                  "committish": {
+                    "type": "string"
+                  },
+                  "subdirectory": {
+                    "type": "string"
+                  },
+                  "spec": {
+                    "type": "string"
+                  },
+                  "scm_type": {
+                    "type": "string"
+                  },
+                  "gem_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_version": {
+                    "type": "string"
+                  },
+                  "spec_generator": {
+                    "type": "string"
+                  },
+                  "spec_template": {
+                    "type": "string"
+                  },
+                  "python_versions": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "builddeps": {
+                    "type": "string"
+                  },
+                  "resultdir": {
+                    "type": "string"
+                  },
+                  "chroot": {
+                    "type": "string"
+                  },
+                  "packagename": {
+                    "type": "string"
+                  },
+                  "source_build_method": {
+                    "type": "string"
+                  },
+                  "max_builds": {
+                    "type": "integer"
+                  },
+                  "webhook_rebuild": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/package/edit/{ownername}/{projectname}/{package_name}/": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Package"
+            }
+          }
+        },
+        "summary": "Edit a package",
+        "description": "Edit an existing package within a Copr project.\n\nSee what fields are required for which source types:\nhttps://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+        "operationId": "post_package_edit",
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "User or group name"
+          },
+          {
+            "name": "projectname",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Name of the project"
+          },
+          {
+            "name": "package_name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Name of the package"
+          },
+          {
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+            "name": "source_type_text",
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "tags": [
+          "package"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone_url": {
+                    "type": "string"
+                  },
+                  "committish": {
+                    "type": "string"
+                  },
+                  "subdirectory": {
+                    "type": "string"
+                  },
+                  "spec": {
+                    "type": "string"
+                  },
+                  "scm_type": {
+                    "type": "string"
+                  },
+                  "gem_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_version": {
+                    "type": "string"
+                  },
+                  "spec_generator": {
+                    "type": "string"
+                  },
+                  "spec_template": {
+                    "type": "string"
+                  },
+                  "python_versions": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "builddeps": {
+                    "type": "string"
+                  },
+                  "resultdir": {
+                    "type": "string"
+                  },
+                  "chroot": {
+                    "type": "string"
+                  },
+                  "packagename": {
+                    "type": "string"
+                  },
+                  "source_build_method": {
+                    "type": "string"
+                  },
+                  "max_builds": {
+                    "type": "integer"
+                  },
+                  "webhook_rebuild": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/package/edit/{ownername}/{projectname}/{package_name}/{source_type_text}": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Package"
+            }
+          }
+        },
+        "summary": "Edit a package",
+        "description": "Edit an existing package within a Copr project.\n\nSee what fields are required for which source types:\nhttps://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+        "operationId": "post_package_edit",
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "User or group name"
+          },
+          {
+            "name": "projectname",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Name of the project"
+          },
+          {
+            "name": "package_name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Name of the package"
+          },
+          {
+            "name": "source_type_text",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html"
+          }
+        ],
+        "tags": [
+          "package"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone_url": {
+                    "type": "string"
+                  },
+                  "committish": {
+                    "type": "string"
+                  },
+                  "subdirectory": {
+                    "type": "string"
+                  },
+                  "spec": {
+                    "type": "string"
+                  },
+                  "scm_type": {
+                    "type": "string"
+                  },
+                  "gem_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_version": {
+                    "type": "string"
+                  },
+                  "spec_generator": {
+                    "type": "string"
+                  },
+                  "spec_template": {
+                    "type": "string"
+                  },
+                  "python_versions": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "builddeps": {
+                    "type": "string"
+                  },
+                  "resultdir": {
+                    "type": "string"
+                  },
+                  "chroot": {
+                    "type": "string"
+                  },
+                  "packagename": {
+                    "type": "string"
+                  },
+                  "source_build_method": {
+                    "type": "string"
+                  },
+                  "max_builds": {
+                    "type": "integer"
+                  },
+                  "webhook_rebuild": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/project-chroot/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ProjectChroot"
+            }
+          }
+        },
+        "summary": "Get a project chroot",
+        "description": "Get settings for a single project chroot.",
+        "operationId": "get_project_chroot",
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "User or group name"
+          },
+          {
+            "name": "projectname",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Name of the project"
+          },
+          {
+            "name": "chrootname",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Mock chroot"
+          }
+        ],
+        "tags": [
+          "project-chroot"
+        ]
+      }
+    },
+    "/project-chroot/build-config": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ProjectChrootBuildConfig"
+            }
+          }
+        },
+        "summary": "Get a build config",
+        "description": "Generate a build config based on a project chroot settings.",
+        "operationId": "get_build_config",
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "User or group name"
+          },
+          {
+            "name": "projectname",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Name of the project"
+          },
+          {
+            "name": "chrootname",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Mock chroot"
+          }
+        ],
+        "tags": [
+          "project-chroot"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "build",
+      "description": "Builds"
+    },
+    {
+      "name": "package",
+      "description": "Packages"
+    },
+    {
+      "name": "project-chroot",
+      "description": "Project chroots"
+    }
+  ],
+  "servers": [
+    {
+      "url": "/api_3"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

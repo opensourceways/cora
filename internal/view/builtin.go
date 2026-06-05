@@ -319,4 +319,26 @@ var builtinViews = map[string]map[string]ViewConfig{
 			},
 		},
 	},
+	"eur": {
+		"builds/get": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "ID", Width: 10},
+				{Field: "state", Label: "State", Colorize: true},
+				{Field: "chroot", Label: "Chroot", Width: 20},
+				{Field: "source_package", Label: "Source Package", Width: 18},
+				{Field: "submitted_on", Label: "Submitted", Format: FormatDate},
+				{Field: "started_on", Label: "Started", Format: FormatDate},
+				{Field: "ended_on", Label: "Ended", Format: FormatDate},
+			},
+		},
+		"packages/get": {
+			Columns: []ViewColumn{
+				{Field: "name", Label: "Package", Width: 24},
+				{Field: "source_type", Label: "Source Type", Width: 12},
+				{Field: "ownername", Label: "Owner", Width: 16},
+				{Field: "projectname", Label: "Project", Width: 20},
+			},
+		},
+	},
+
 }

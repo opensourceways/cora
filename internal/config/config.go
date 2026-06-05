@@ -59,6 +59,7 @@ type AuthConfig struct {
 	Gitcode   *GitcodeAuth   `yaml:"gitcode,omitempty"   mapstructure:"gitcode"`
 	Github    *GithubAuth    `yaml:"github,omitempty"    mapstructure:"github"`
 	Jenkins   *JenkinsAuth   `yaml:"jenkins,omitempty"   mapstructure:"jenkins"`
+	EUR      *EURAuth      `yaml:"eur,omitempty"      mapstructure:"eur"`
 }
 
 // EtherpadAuth holds the API key for the Etherpad REST API.
@@ -103,6 +104,18 @@ type GithubAuth struct {
 //	CORA_SERVICES_<NAME>_AUTH_JENKINS_USERNAME
 //	CORA_SERVICES_<NAME>_AUTH_JENKINS_API_TOKEN
 type JenkinsAuth struct {
+	Username string `yaml:"username"   mapstructure:"username"`
+	APIToken string `yaml:"api_token"  mapstructure:"api_token"`
+}
+
+// EURAuth holds credentials for the openEuler Copr (EUR) build service.
+// EUR uses HTTP Basic Auth with username + token.
+//
+// Override via environment variables:
+//
+//	CORA_SERVICES_<NAME>_AUTH_EUR_USERNAME
+//	CORA_SERVICES_<NAME>_AUTH_EUR_API_TOKEN
+type EURAuth struct {
 	Username string `yaml:"username"   mapstructure:"username"`
 	APIToken string `yaml:"api_token"  mapstructure:"api_token"`
 }
