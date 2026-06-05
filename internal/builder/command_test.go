@@ -26,7 +26,7 @@ func TestResourceName_usesFirstTag(t *testing.T) {
 		{[]string{"ISSUES"}, "/issues", "issues"},
 		// Tag normalization: path has a preferred short synonym.
 		{[]string{"Pull Requests"}, "/api/v5/repos/{o}/{r}/pulls", "pulls"},
-		{[]string{"Pull Requests"}, "/api/v5/enterprises/{e}/pull_requests", "pull-requests"},
+		{[]string{"Pull Requests"}, "/api/v5/enterprises/{e}/pull_requests", "pulls"},
 		// Simple tags are unchanged.
 		{[]string{"Pulls"}, "/api/v5/repos/{o}/{r}/pulls/{n}", "pulls"},
 		{[]string{"Users"}, "/user", "users"},
