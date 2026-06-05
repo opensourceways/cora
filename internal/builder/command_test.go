@@ -118,6 +118,8 @@ func TestLastPathSegment(t *testing.T) {
 		{"/", "root"},
 		{"/{id}", "root"},
 		{"/v1/topics/{id}/posts", "posts"},
+		// Underscores normalized to hyphens.
+		{"/api/v5/repos/{o}/{r}/pulls/option_testers", "option-testers"},
 	}
 	for _, tc := range tests {
 		got := lastPathSegment(tc.path)

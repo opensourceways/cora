@@ -306,7 +306,7 @@ func lastPathSegment(path string) string {
 	segs := strings.Split(strings.Trim(clean, "/"), "/")
 	for i := len(segs) - 1; i >= 0; i-- {
 		if s := segs[i]; s != "" && !strings.HasPrefix(s, "{") {
-			return strings.ToLower(s)
+			return strings.ToLower(strings.ReplaceAll(s, "_", "-"))
 		}
 	}
 	return "root"
