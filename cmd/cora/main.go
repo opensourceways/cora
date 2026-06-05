@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cncf/cora/internal/output/color"
+
 	"github.com/spf13/cobra"
 
 	"github.com/cncf/cora/internal/builder"
@@ -64,6 +66,11 @@ func run() error {
 driven by OpenAPI specs published by each backend service.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if noColor, _ := cmd.Flags().GetBool("no-color"); noColor {
+				color.Disable()
+			}
+		},
 	}
 
 	// Global persistent flags available to every sub-command.
@@ -71,6 +78,7 @@ driven by OpenAPI specs published by each backend service.`,
 	root.PersistentFlags().Bool("dry-run", false, "print the HTTP request without sending it")
 	root.PersistentFlags().Bool("refresh-spec", false, "bypass cache and re-fetch the service spec")
 	root.PersistentFlags().Bool("verbose", false, "enable verbose output for debugging (INFO + DEBUG logs)")
+	root.PersistentFlags().Bool("no-color", false, "disable colored output")
 
 	// ── Two-phase command loading (mirrors Google CLI) ────────────────────────
 	//

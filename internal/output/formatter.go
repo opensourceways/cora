@@ -10,6 +10,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"
 
+	"github.com/cncf/cora/internal/output/color"
 	"github.com/cncf/cora/internal/view"
 )
 
@@ -110,6 +111,9 @@ func renderKVTable(obj map[string]interface{}, cols []view.ViewColumn) {
 	for _, col := range cols {
 		val := view.ExtractField(obj, col.Field)
 		rendered := view.FormatValue(val, col)
+			if col.Colorize {
+				rendered = color.State(rendered)
+			}
 		label := view.LabelFor(col)
 		t.Append([]string{label, sanitize(rendered, col.Format)})
 	}
@@ -149,6 +153,9 @@ func renderListTable(items []map[string]interface{}, cols []view.ViewColumn) {
 			val := view.ExtractField(item, col.Field)
 			// In list mode, always collapse multiline to a single line.
 			rendered := view.FormatValue(val, col)
+				if col.Colorize {
+					rendered = color.State(rendered)
+				}
 			rendered = strings.ReplaceAll(rendered, "\n", " ")
 			rendered = strings.ReplaceAll(rendered, "\r", "")
 			row[i] = sanitize(rendered, view.FormatText)
