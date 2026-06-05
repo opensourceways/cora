@@ -26,6 +26,7 @@
 | [ Etherpad ](https://etherpad.org)   | `etherpad` | 内置嵌入     | API Key（`?apikey=`）, 统一认证待补充      |
 | [ Jenkins ](https://www.jenkins.io)  | `jenkins`  | 内置嵌入     | HTTP Basic Auth（`base64(username:api_token)`） |
 | [ Forum ](https://www.discourse.org) | `forum`    | spec_url | API Key + 用户名（请求头）,  统一认证待补充      |
+| [ EUR ](https://eur.openeuler.openatom.cn)  | `eur`      | 内置嵌入     | HTTP Basic Auth（`base64(username:api_token)`） |
 
 ## 命令结构
 
@@ -109,13 +110,13 @@ cora forum posts list --refresh-spec
 
 ```bash
 # 列出所有 pad
-cora etherpad pads list
+cora etherpad pad list-all-pads
 
 # 获取 pad 内容
-cora etherpad pads get-text --pad-id my-pad
+cora etherpad pad get-text --pad-id my-pad
 
 # 创建新 pad
-cora etherpad pads create-pad --pad-id new-pad
+cora etherpad pad create-pad --pad-id new-pad
 ```
 
 ### Jenkins
@@ -154,6 +155,22 @@ cora jenkins queue list
 
 # JSON 格式输出
 cora jenkins jobs list --format json | jq '.jobs[].name'
+```
+
+### EUR（openEuler Copr）
+
+```bash
+# 获取构建详情
+cora eur build get --build-id 12345
+
+# 获取软件包信息
+cora eur package get --ownername mywaaagh_admin --projectname pypi --packagename python-flask-log-request-id
+
+# 获取项目 Chroot 配置
+cora eur project-chroot get --ownername mywaaagh_admin --projectname pypi --chrootname openeuler-22.03_LTS_SP1-x86_64
+
+# JSON 格式输出
+cora eur build get --build-id 12345 --format json | jq '.state'
 ```
 
 ### 全局参数
@@ -203,11 +220,13 @@ cora 内置了常用操作的 View 定义（字段选取、格式化），同时
 | forum    | `topics list` | 横向表格         |
 | forum    | `topics get`  | 竖式 KV 表      |
 | forum    | `posts list`  | 横向表格         |
-| etherpad | `pads list`   | 横向表格         |
+| etherpad | `pad list-all-pads` | 横向表格         |
 | jenkins  | `jobs list`   | 横向表格         |
 | jenkins  | `jobs get`    | 竖式 KV 表      |
 | jenkins  | `builds get`  | 竖式 KV 表（含 Artifacts） |
 | jenkins  | `queue list`  | 横向表格         |
+| eur      | `builds/get`  | 竖式 KV 表      |
+| eur      | `packages/get`| 竖式 KV 表      |
 
 ### 配置 views.yaml
 
@@ -381,6 +400,14 @@ services:
         username: "你的 Jenkins 用户名"
         api_token: "你的 Jenkins API Token"          # JENKINS_URL/user/<you>/configure
 
+	  # ── EUR / openEuler Copr（内置 Spec，无需 spec_url）──
+	  eur:
+	    base_url: https://eur.openeuler.openatom.cn/api_3  # 必填
+	    auth:
+	      eur:
+	        username: "你的 Copr 用户名"
+	        api_token: "你的 Copr API Token"
+
   # ── Forum / Discourse（需要 spec_url）──
   forum:
     spec_url: assets/openapi/forum/openapi.json   # 支持 http://、https://、file:// 或裸路径
@@ -404,7 +431,7 @@ spec_cache:
 views_file: ~/.config/cora/views.yaml
 ```
 
-> **注意**：内置服务（gitcode、github、etherpad、jenkins）的 `base_url` 没有硬编码默认值，必须在配置文件中显式声明。
+> **注意**：内置服务（gitcode、github、etherpad、jenkins、eur）的 `base_url` 没有硬编码默认值，必须在配置文件中显式声明。
 
 ### 环境变量
 
@@ -423,6 +450,8 @@ views_file: ~/.config/cora/views.yaml
 | `CORA_SERVICES_ETHERPAD_AUTH_ETHERPAD_API_KEY`     | `services.etherpad.auth.etherpad.api_key`     | Etherpad API Key  |
 | `CORA_SERVICES_JENKINS_AUTH_JENKINS_USERNAME`     | `services.jenkins.auth.jenkins.username`     | Jenkins 用户名       |
 | `CORA_SERVICES_JENKINS_AUTH_JENKINS_API_TOKEN`    | `services.jenkins.auth.jenkins.api_token`    | Jenkins API Token |
+| `CORA_SERVICES_EUR_AUTH_EUR_USERNAME`             | `services.eur.auth.eur.username`             | EUR Copr 用户名     |
+| `CORA_SERVICES_EUR_AUTH_EUR_API_TOKEN`            | `services.eur.auth.eur.api_token`            | EUR Copr API Token |
 | `CORA_SERVICES_<NAME>_AUTH_DISCOURSE_API_KEY`      | `services.<name>.auth.discourse.api_key`      | Discourse API Key |
 | `CORA_SERVICES_<NAME>_AUTH_DISCOURSE_API_USERNAME` | `services.<name>.auth.discourse.api_username` | Discourse 用户名     |
 
@@ -551,6 +580,12 @@ cora/
 │   └── errors_test.go
 ├── assets/
 │   ├── openapi/                      # 内置服务 OpenAPI Spec 文件
+│   ├── openapi/                      # 内置服务 OpenAPI Spec 文件
+│   │   ├── eur/openapi.json
+│   │   ├── gitcode/openapi.json
+│   │   ├── github/api.github.com.json
+│   │   ├── jenkins/openapi.json
+│   │   └── etherpad/openapi.json
 │   └── assets.go                     # go:embed 声明
 ├── config/
 │   ├── config.example.yaml           # 配置文件示例
@@ -600,7 +635,7 @@ cora/
 | 2   | 鉴权错误（未登录或凭证无效）       |
 | 3   | 参数校验错误               |
 | 4   | Spec 加载失败            |
-| 5   | 配置错误（服务未配置或配置文件损坏）   |
+| 5   | 配置错误（服务未配置、认证失败或参数缺失） |
 | 127 | 未分类错误                |
 
 ## Smoke 测试
@@ -614,7 +649,7 @@ Smoke Runner（`cmd/smoke`）读取 `scenarios/` 目录下的 YAML 场景文件�
 ### 场景文件格式
 
 ```yaml
-name: "GitCode · issues list"
+name: "gitcode/issues-list"
 service: gitcode
 args:
   - issues
