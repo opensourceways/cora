@@ -264,7 +264,7 @@ var builtinViews = map[string]map[string]ViewConfig{
 			RootField: "jobs",
 			Columns: []ViewColumn{
 				{Field: "name", Label: "Name", Width: 40},
-				{Field: "color", Label: "Status", Width: 12},
+				{Field: "color", Label: "Status", Width: 12, Colorize: true},
 				{Field: "url", Label: "URL", Truncate: 60, Width: 62},
 			},
 		},
@@ -272,7 +272,7 @@ var builtinViews = map[string]map[string]ViewConfig{
 			Columns: []ViewColumn{
 				{Field: "name", Label: "Name"},
 				{Field: "description", Label: "Description", Truncate: 120},
-				{Field: "color", Label: "Status"},
+				{Field: "color", Label: "Status", Colorize: true},
 				{Field: "buildable", Label: "Buildable"},
 				{Field: "inQueue", Label: "In Queue"},
 				{Field: "nextBuildNumber", Label: "Next Build"},
@@ -292,7 +292,7 @@ var builtinViews = map[string]map[string]ViewConfig{
 				{Field: "number", Label: "No."},
 				{Field: "displayName", Label: "Name"},
 				{Field: "result", Label: "Result", Colorize: true},
-				{Field: "building", Label: "Building"},
+				{Field: "building", Label: "Building", Colorize: true},
 				{Field: "duration", Label: "Duration (ms)"},
 				{Field: "timestamp", Label: "Timestamp", Format: FormatDate},
 				{Field: "url", Label: "URL"},

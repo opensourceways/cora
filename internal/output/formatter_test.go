@@ -202,3 +202,25 @@ func TestPrint_withViewConfig_list(t *testing.T) {
 		t.Errorf("Print list with ViewConfig: %v", err)
 	}
 }
+
+func TestIsColorField(t *testing.T) {
+	tests := []struct {
+		name string
+		want bool
+	}{
+		{"state", true},
+		{"status", true},
+		{"result", true},
+		{"color", true},
+		{"phase", true},
+		{"building", true},
+		{"title", false},
+		{"name", false},
+		{"id", false},
+	}
+	for _, tc := range tests {
+		if got := isColorField(tc.name); got != tc.want {
+			t.Errorf("isColorField(%q) = %v, want %v", tc.name, got, tc.want)
+		}
+	}
+}

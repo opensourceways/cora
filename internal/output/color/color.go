@@ -54,25 +54,29 @@ func State(val string) string {
 	switch {
 	case lower == "open", lower == "active",
 		lower == "success", lower == "approved",
-		lower == "passed", lower == "healthy":
+		lower == "passed", lower == "healthy",
+		lower == "blue", lower == "true":
 		return green + val + reset
 
 	case lower == "closed", lower == "failed",
 		lower == "rejected", lower == "error",
-		lower == "failure", lower == "unhealthy":
+		lower == "failure", lower == "unhealthy",
+		lower == "red", lower == "aborted":
 		return red + val + reset
 
 	case lower == "merged":
 		return magenta + val + reset
 
-	case lower == "pending", lower == "waiting":
+	case lower == "pending", lower == "waiting",
+		lower == "yellow", lower == "unstable":
 		return yellow + val + reset
 
 	case lower == "reviewing", lower == "building",
 		lower == "running", lower == "in_progress":
 		return cyan + val + reset
 
-	case lower == "draft":
+	case lower == "draft", lower == "disabled",
+		lower == "notbuilt", lower == "grey", lower == "gray":
 		return gray + val + reset
 	}
 	return val

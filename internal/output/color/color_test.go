@@ -31,6 +31,14 @@ func TestState(t *testing.T) {
 		{"building", "\033[36m"},
 		{"running", "\033[36m"},
 		{"draft", "\033[90m"},
+		// Jenkins-specific values.
+		{"blue", "\033[32m"},
+		{"red", "\033[31m"},
+		{"yellow", "\033[33m"},
+		{"aborted", "\033[31m"},
+		{"unstable", "\033[33m"},
+		{"disabled", "\033[90m"},
+		{"notbuilt", "\033[90m"},
 		// No color for unknown values.
 		{"unknown", ""},
 		{"", ""},
