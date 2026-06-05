@@ -36413,7 +36413,7 @@
         "description": "",
         "operationId": "get_oauth_authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={state}",
         "tags": [
-          "Oauth2.0"
+          "OAuth2"
         ],
         "parameters": [
           {
@@ -36486,7 +36486,7 @@
         "description": "## 基本信息\n- 请求路径: `/oauth/token`\n- 请求方法: POST\n- 接口说明: 用于获取或刷新访问令牌(access_token)的统一接口\n\n## 请求参数\n\n### Query 参数\n\n| 参数名 | 必填 | 类型 | 说明 |\n|--------|------|------|------|\n| grant_type | 是 | string | 授权类型。可选值:<br/>- `authorization_code`: 授权码模式，用于获取新token<br/>- `refresh_token`: 刷新token模式，用于刷新已有token |\n| code | 条件必填 | string | 授权码。当 grant_type=authorization_code 时必填 |\n| client_id | 条件必填 | string | 注册的客户端ID。当 grant_type=authorization_code 时必填 |\n| refresh_token | 条件必填 | string | 刷新令牌。当 grant_type=refresh_token 时必填 |\n\n### Body 参数\n\n| 参数名 | 必填 | 类型 | 说明 |\n|--------|------|------|------|\n| client_secret | 条件必填 | string | 注册的客户端密钥。当 grant_type=authorization_code 时必填 |\n\n## 使用场景\n\n1. **获取新的访问令牌**\n   - 设置 grant_type=authorization_code\n   - 提供 code、client_id 和 client_secret\n   \n2. **刷新访问令牌**\n   - 设置 grant_type=refresh_token\n   - 提供 refresh_token\n\n## 示例\n\n### 获取新token\n```\nPOST /oauth/token?grant_type=authorization_code&code={code}&client_id={client_id}\nContent-Type: application/json\n\n{\n    \"client_secret\": \"{client_secret}\"\n}\n```\n\n### 刷新token\n```\nPOST /oauth/token?grant_type=refresh_token&refresh_token={refresh_token}\n```",
         "operationId": "post_oauth_token?grant_type=authorization_code&code={code}&client_id={client_id}&client_secret={client_secret}",
         "tags": [
-          "Oauth2.0"
+          "OAuth2"
         ],
         "parameters": [
           {
@@ -37781,7 +37781,7 @@
         "deprecated": false,
         "description": "",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [],
         "requestBody": {
@@ -38038,7 +38038,7 @@
         "description": "",
         "operationId": "post-api-v-5-similarity",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -38140,7 +38140,7 @@
         "description": "根据输入图片和提示词生成新图片，使用multipart/form-data格式上传图片。",
         "operationId": "post-api-v-1-images-edits",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -38228,7 +38228,7 @@
         "description": "",
         "operationId": "post-api-v-1-audio-transcriptions",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -38308,7 +38308,7 @@
         "description": "使用YOLO模型对图片进行目标检测，识别图片中的物体",
         "operationId": "post-api-v-5-detect-yolo",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -38656,7 +38656,7 @@
         "description": "调用此接口创建视频生成任务，如果没有异常返回，可根据 requestId 进行异步视频结果查询。",
         "operationId": "post-api-v-5-video-generate",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -38763,7 +38763,7 @@
         "description": "根据 requestId查询视频生成状态。",
         "operationId": "post-api-v-5-video-status",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -38849,7 +38849,7 @@
         "description": "对音频文件进行情感分类识别",
         "operationId": "post-api-v-5-audio-classification",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [
           {
@@ -39032,7 +39032,7 @@
         "deprecated": false,
         "description": "生成图像\n根据提示词生成图像，支持文本和图片审核",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [],
         "requestBody": {
@@ -39084,7 +39084,7 @@
         "deprecated": false,
         "description": "文本转语音",
         "tags": [
-          "AI hub"
+          "AI-Hub"
         ],
         "parameters": [],
         "requestBody": {

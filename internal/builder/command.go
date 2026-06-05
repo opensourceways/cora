@@ -487,10 +487,15 @@ func hasTrailingParam(path string) bool {
 //	/api/v5/user/issues                          → "user"
 //	/api/v5/orgs/{org}/issues                    → "org"
 func pathContext(path string) string {
-	segs := strings.Split(strings.Trim(path, "/"), "/")
+	clean := strings.TrimSuffix(path, ".json")
+	segs := strings.Split(strings.Trim(clean, "/"), "/")
 	for _, s := range segs {
 		sl := strings.ToLower(s)
 		if sl == "" || sl == "api" || strings.HasPrefix(sl, "{") {
+			continue
+		}
+		// Skip single-letter segments (e.g. "t", "u" in Discourse paths).
+		if len(sl) == 1 {
 			continue
 		}
 		// Skip version segments: "v5", "v1", "v3", …
@@ -509,8 +514,10 @@ func pathContext(path string) string {
 		}
 		// Strip trailing 's' to get singular form: "repos"→"repo", "enterprises"→"enterprise"
 		if strings.HasSuffix(sl, "s") && len(sl) > 2 {
-			return sl[:len(sl)-1]
+			sl = sl[:len(sl)-1]
 		}
+		// Normalize underscores to hyphens (e.g. "post_action" → "post-action").
+		sl = strings.ReplaceAll(sl, "_", "-")
 		return sl
 	}
 	return ""

@@ -260,6 +260,14 @@ func TestPathContext(t *testing.T) {
 		{"/api/v5/user/issues", "user"},
 		{"/api/v5/orgs/{org}/issues", "org"},
 		{"/posts/{id}.json", "post"},
+		// .json suffix is stripped before analysis.
+		{"/posts.json", "post"},
+		// Single-letter segments (e.g. "t", "u" in Discourse) are skipped.
+		{"/t/{id}.json", ""},
+		{"/u/{username}.json", ""},
+		{"/u/by-external/{id}.json", "by-external"},
+		// Underscores are normalized to hyphens.
+		{"/post_actions.json", "post-action"},
 	}
 	for _, tc := range tests {
 		got := pathContext(tc.path)
