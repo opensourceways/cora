@@ -1,0 +1,16 @@
+name: "eur/build-get"
+service: eur
+args:
+  - build
+  - get
+  - --build-id
+  - 12345
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["id", "state", "projectname", "submitted_on"]
+  - type: json_key_not_empty
+    key: "state"

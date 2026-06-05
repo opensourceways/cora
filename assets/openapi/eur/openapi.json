@@ -1,0 +1,1024 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Copr API",
+    "version": "v3",
+    "description": "See python client - <https://python-copr.readthedocs.io>"
+  },
+  "servers": [
+    {
+      "url": "/api_3"
+    }
+  ],
+  "paths": {
+    "/build/{build_id}": {
+      "get": {
+        "operationId": "get_get_build",
+        "summary": "Get a build",
+        "tags": [
+          "build"
+        ],
+        "parameters": [
+          {
+            "name": "build_id",
+            "in": "path",
+            "required": true,
+            "description": "Numeric ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Build"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/package/": {
+      "get": {
+        "operationId": "get_get_package",
+        "summary": "Get a package",
+        "tags": [
+          "package"
+        ],
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "query",
+            "required": true,
+            "description": "User or group name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "projectname",
+            "in": "query",
+            "required": true,
+            "description": "Name of the project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "packagename",
+            "in": "query",
+            "required": true,
+            "description": "Name of the package",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "with_latest_build",
+            "in": "query",
+            "required": false,
+            "description": "The result will contain 'builds' dictionary with the latest submitted build of this particular package within the project",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "with_latest_succeeded_build",
+            "in": "query",
+            "required": false,
+            "description": "The result will contain 'builds' dictionary with the latest successful build of this particular package within the project.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/package/add/{ownername}/{projectname}/{package_name}/{source_type_text}": {
+      "post": {
+        "operationId": "post_package_add",
+        "summary": "Create a package",
+        "tags": [
+          "package"
+        ],
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "path",
+            "required": true,
+            "description": "User or group name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "projectname",
+            "in": "path",
+            "required": true,
+            "description": "Name of the project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "package_name",
+            "in": "path",
+            "required": true,
+            "description": "Name of the package",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "source_type_text",
+            "in": "path",
+            "required": true,
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone_url": {
+                    "type": "string"
+                  },
+                  "committish": {
+                    "type": "string"
+                  },
+                  "subdirectory": {
+                    "type": "string"
+                  },
+                  "spec": {
+                    "type": "string"
+                  },
+                  "scm_type": {
+                    "type": "string"
+                  },
+                  "gem_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_version": {
+                    "type": "string"
+                  },
+                  "spec_generator": {
+                    "type": "string"
+                  },
+                  "spec_template": {
+                    "type": "string"
+                  },
+                  "python_versions": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "builddeps": {
+                    "type": "string"
+                  },
+                  "resultdir": {
+                    "type": "string"
+                  },
+                  "chroot": {
+                    "type": "string"
+                  },
+                  "packagename": {
+                    "type": "string"
+                  },
+                  "source_build_method": {
+                    "type": "string"
+                  },
+                  "max_builds": {
+                    "type": "integer"
+                  },
+                  "webhook_rebuild": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/package/edit/{ownername}/{projectname}/{package_name}/": {
+      "post": {
+        "operationId": "post_package_edit",
+        "summary": "Edit a package",
+        "tags": [
+          "package"
+        ],
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "path",
+            "required": true,
+            "description": "User or group name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "projectname",
+            "in": "path",
+            "required": true,
+            "description": "Name of the project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "package_name",
+            "in": "path",
+            "required": true,
+            "description": "Name of the package",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "source_type_text",
+            "in": "query",
+            "required": false,
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone_url": {
+                    "type": "string"
+                  },
+                  "committish": {
+                    "type": "string"
+                  },
+                  "subdirectory": {
+                    "type": "string"
+                  },
+                  "spec": {
+                    "type": "string"
+                  },
+                  "scm_type": {
+                    "type": "string"
+                  },
+                  "gem_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_version": {
+                    "type": "string"
+                  },
+                  "spec_generator": {
+                    "type": "string"
+                  },
+                  "spec_template": {
+                    "type": "string"
+                  },
+                  "python_versions": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "builddeps": {
+                    "type": "string"
+                  },
+                  "resultdir": {
+                    "type": "string"
+                  },
+                  "chroot": {
+                    "type": "string"
+                  },
+                  "packagename": {
+                    "type": "string"
+                  },
+                  "source_build_method": {
+                    "type": "string"
+                  },
+                  "max_builds": {
+                    "type": "integer"
+                  },
+                  "webhook_rebuild": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/package/edit/{ownername}/{projectname}/{package_name}/{source_type_text}": {
+      "post": {
+        "operationId": "post_package_edit",
+        "summary": "Edit a package",
+        "tags": [
+          "package"
+        ],
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "path",
+            "required": true,
+            "description": "User or group name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "projectname",
+            "in": "path",
+            "required": true,
+            "description": "Name of the project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "package_name",
+            "in": "path",
+            "required": true,
+            "description": "Name of the package",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "source_type_text",
+            "in": "path",
+            "required": true,
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone_url": {
+                    "type": "string"
+                  },
+                  "committish": {
+                    "type": "string"
+                  },
+                  "subdirectory": {
+                    "type": "string"
+                  },
+                  "spec": {
+                    "type": "string"
+                  },
+                  "scm_type": {
+                    "type": "string"
+                  },
+                  "gem_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_name": {
+                    "type": "string"
+                  },
+                  "pypi_package_version": {
+                    "type": "string"
+                  },
+                  "spec_generator": {
+                    "type": "string"
+                  },
+                  "spec_template": {
+                    "type": "string"
+                  },
+                  "python_versions": {
+                    "type": "string"
+                  },
+                  "script": {
+                    "type": "string"
+                  },
+                  "builddeps": {
+                    "type": "string"
+                  },
+                  "resultdir": {
+                    "type": "string"
+                  },
+                  "chroot": {
+                    "type": "string"
+                  },
+                  "packagename": {
+                    "type": "string"
+                  },
+                  "source_build_method": {
+                    "type": "string"
+                  },
+                  "max_builds": {
+                    "type": "integer"
+                  },
+                  "webhook_rebuild": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/project-chroot/": {
+      "get": {
+        "operationId": "get_project_chroot",
+        "summary": "Get a project chroot",
+        "tags": [
+          "project-chroot"
+        ],
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "query",
+            "required": true,
+            "description": "User or group name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "projectname",
+            "in": "query",
+            "required": true,
+            "description": "Name of the project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chrootname",
+            "in": "query",
+            "required": true,
+            "description": "Mock chroot",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectChroot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/project-chroot/build-config": {
+      "get": {
+        "operationId": "get_build_config",
+        "summary": "Get a build config",
+        "tags": [
+          "project-chroot"
+        ],
+        "parameters": [
+          {
+            "name": "ownername",
+            "in": "query",
+            "required": true,
+            "description": "User or group name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "projectname",
+            "in": "query",
+            "required": true,
+            "description": "Name of the project",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chrootname",
+            "in": "query",
+            "required": true,
+            "description": "Mock chroot",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectChrootBuildConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "build",
+      "description": "Builds"
+    },
+    {
+      "name": "package",
+      "description": "Packages"
+    },
+    {
+      "name": "project-chroot",
+      "description": "Project chroots"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "Build": {
+        "properties": {
+          "chroots": {
+            "type": "array",
+            "description": "List of chroot names",
+            "example": [
+              "fedora-37-x86_64",
+              "fedora-rawhide-x86_64"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "ended_on": {
+            "type": "integer",
+            "description": "Timestamp when the build ended",
+            "example": 1677695963
+          },
+          "id": {
+            "type": "integer",
+            "description": "Numeric ID",
+            "example": 123
+          },
+          "is_background": {
+            "type": "boolean",
+            "description": "The build is marked as a background job"
+          },
+          "ownername": {
+            "type": "string",
+            "description": "User or group name",
+            "example": "@copr"
+          },
+          "project_dirname": {
+            "type": "string",
+            "description": "",
+            "example": "copr-dev:pr:123"
+          },
+          "projectname": {
+            "type": "string",
+            "description": "Name of the project",
+            "example": "copr-dev"
+          },
+          "repo_url": {
+            "type": "string",
+            "description": "See REPO OPTIONS in `man 5 dnf.conf`",
+            "example": "https://download.copr.fedorainfracloud.org/results/@copr/copr-dev/fedora-$releasever-$basearch/"
+          },
+          "source_package": {
+            "$ref": "#/components/schemas/SourcePackage"
+          },
+          "started_on": {
+            "type": "integer",
+            "description": "Timestamp when the build started",
+            "example": 1677695545
+          },
+          "state": {
+            "type": "string",
+            "description": "",
+            "example": "succeeded"
+          },
+          "submitted_on": {
+            "type": "integer",
+            "description": "Timestamp when the build was submitted",
+            "example": 1677695304
+          },
+          "submitter": {
+            "type": "string",
+            "description": "Username of the person who submitted this build",
+            "example": "frostyx"
+          }
+        },
+        "type": "object"
+      },
+      "SourcePackage": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the package",
+            "example": "copr-cli"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL for downloading the SRPM package"
+          },
+          "version": {
+            "type": "string",
+            "description": "Package version",
+            "example": "1.105-1.git.53.319c6de"
+          }
+        },
+        "type": "object"
+      },
+      "Package": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Numeric ID",
+            "example": 123
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the package",
+            "example": "copr-cli"
+          },
+          "projectname": {
+            "type": "string",
+            "description": "Name of the project",
+            "example": "copr-dev"
+          },
+          "ownername": {
+            "type": "string",
+            "description": "User or group name",
+            "example": "@copr"
+          },
+          "source_type": {
+            "type": "string",
+            "description": "See https://python-copr.readthedocs.io/en/latest/client_v3/package_source_types.html",
+            "example": "scm"
+          },
+          "source_dict": {
+            "type": "object"
+          },
+          "auto_rebuild": {
+            "type": "boolean",
+            "description": "Auto-rebuild the package? (i.e. every commit or new tag)"
+          },
+          "builds": {
+            "$ref": "#/components/schemas/PackageBuilds"
+          }
+        },
+        "type": "object"
+      },
+      "PackageBuilds": {
+        "properties": {
+          "latest": {
+            "$ref": "#/components/schemas/Build"
+          },
+          "latest_succeeded": {
+            "$ref": "#/components/schemas/Build"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectChroot": {
+        "properties": {
+          "mock_chroot": {
+            "type": "string",
+            "description": "Mock chroot",
+            "example": "fedora-rawhide-x86_64"
+          },
+          "ownername": {
+            "type": "string",
+            "description": "User or group name",
+            "example": "@copr"
+          },
+          "projectname": {
+            "type": "string",
+            "description": "Name of the project",
+            "example": "copr-dev"
+          },
+          "comps_name": {
+            "type": "string",
+            "description": "Name of the comps.xml file"
+          },
+          "additional_repos": {
+            "type": "array",
+            "description": "Additional repos to be used for builds in this chroot",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_packages": {
+            "type": "array",
+            "description": "Additional packages to be always present in minimal buildroot",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_modules": {
+            "type": "array",
+            "description": "List of modules that will be enabled or disabled in the given chroot",
+            "example": [
+              "module1:stream",
+              "!module2:stream"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "with_opts": {
+            "type": "array",
+            "description": "Mock --with option",
+            "items": {
+              "type": "string"
+            }
+          },
+          "without_opts": {
+            "type": "array",
+            "description": "Mock --without option",
+            "items": {
+              "type": "string"
+            }
+          },
+          "delete_after_days": {
+            "type": "integer",
+            "description": "The project will be automatically deleted after this many days",
+            "example": 30
+          },
+          "isolation": {
+            "type": "string",
+            "description": "Mock isolation feature setup. Possible values are 'default', 'simple', 'nspawn'.",
+            "example": "nspawn"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectChrootBuildConfig": {
+        "properties": {
+          "chroot": {
+            "type": "string",
+            "description": "Mock chroot",
+            "example": "fedora-rawhide-x86_64"
+          },
+          "repos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Repo"
+            }
+          },
+          "additional_repos": {
+            "type": "array",
+            "description": "Additional repos to be used for builds in this chroot",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_packages": {
+            "type": "array",
+            "description": "Additional packages to be always present in minimal buildroot",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_modules": {
+            "type": "array",
+            "description": "List of modules that will be enabled or disabled in the given chroot",
+            "example": [
+              "module1:stream",
+              "!module2:stream"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "enable_net": {
+            "type": "boolean",
+            "description": "Enable internet access during builds"
+          },
+          "with_opts": {
+            "type": "array",
+            "description": "Mock --with option",
+            "items": {
+              "type": "string"
+            }
+          },
+          "without_opts": {
+            "type": "array",
+            "description": "Mock --without option",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isolation": {
+            "type": "string",
+            "description": "Mock isolation feature setup. Possible values are 'default', 'simple', 'nspawn'.",
+            "example": "nspawn"
+          }
+        },
+        "type": "object"
+      },
+      "Repo": {
+        "properties": {
+          "baseurl": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "example": "copr_base"
+          },
+          "name": {
+            "type": "string",
+            "example": "Copr repository"
+          },
+          "module_hotfixes": {
+            "type": "boolean",
+            "description": "Allow non-module packages to override module packages"
+          }
+        },
+        "type": "object"
+      },
+      "Pagination": {
+        "properties": {
+          "limit_field": {
+            "type": "integer",
+            "description": "Limit",
+            "example": 20
+          },
+          "offset_field": {
+            "type": "integer",
+            "description": "Offset",
+            "example": 0
+          },
+          "order_field": {
+            "type": "string",
+            "description": "Order by",
+            "example": "id"
+          },
+          "order_type_field": {
+            "type": "string",
+            "description": "Order type",
+            "example": "DESC"
+          }
+        },
+        "type": "object"
+      },
+      "SourceDictSCM": {
+        "properties": {
+          "clone_url": {
+            "type": "string",
+            "description": "URL to your Git or SVN repository",
+            "example": "https://github.com/fedora-copr/copr.git"
+          },
+          "committish": {
+            "type": "string",
+            "description": "Specific branch, tag, or commit that you want to build",
+            "example": "main"
+          },
+          "source_build_method": {
+            "type": "string",
+            "description": "https://docs.pagure.org/copr.copr/user_documentation.html#scm",
+            "example": "tito"
+          },
+          "spec": {
+            "type": "string",
+            "description": "Path to your .spec file under the specified subdirectory",
+            "example": "copr-cli.spec"
+          },
+          "subdirectory": {
+            "type": "string",
+            "description": "Subdirectory where source files and .spec are located",
+            "example": "cli"
+          },
+          "type": {
+            "type": "string",
+            "default": "Possible values are 'git', 'svn'",
+            "example": "git"
+          }
+        },
+        "type": "object"
+      },
+      "SourceDictPyPI": {
+        "properties": {
+          "pypi_package_name": {
+            "type": "string",
+            "description": "Package name in the Python Package Index.",
+            "example": "copr"
+          },
+          "pypi_package_version": {
+            "type": "string",
+            "description": "PyPI package version",
+            "example": "1.128pre"
+          },
+          "spec_generator": {
+            "type": "string",
+            "description": "Tool for generating specfile from a PyPI package. The options are full-featured pyp2rpm with cross distribution support, and pyp2spec that is being actively developed and considered to be the future.",
+            "example": "pyp2spec"
+          },
+          "spec_template": {
+            "type": "string",
+            "description": "Name of the spec template. This option is limited to pyp2rpm spec generator.",
+            "example": "default"
+          },
+          "python_versions": {
+            "type": "array",
+            "description": "For what python versions to build. This option is limited to pyp2rpm spec generator.",
+            "example": [
+              "3",
+              "2"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

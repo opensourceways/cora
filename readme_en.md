@@ -26,6 +26,7 @@ Cora, Community Collaboration CLI. A unified command-line interface to interact 
 | [Etherpad](https://etherpad.org) | `etherpad` | Built-in (no `spec_url` needed) | API key (`?apikey=`) |
 | [Jenkins](https://www.jenkins.io) | `jenkins` | Built-in (no `spec_url` needed) | HTTP Basic Auth (`base64(username:api_token)`) |
 | [Forum / Discourse](https://www.discourse.org) | `forum` (customisable) | Requires `spec_url` | API key + username (headers) |
+| [EUR / openEuler Copr](https://eur.openeuler.openatom.cn) | `eur` | Built-in (no `spec_url` needed) | HTTP Basic Auth (`base64(username:api_token)`) |
 
 > Built-in services (gitcode, github, etherpad, jenkins) have their OpenAPI spec embedded in the binary — no `spec_url` required. However, `base_url` must be explicitly set in the config file; there are no hardcoded default URLs.
 
@@ -156,6 +157,22 @@ cora jenkins queue list
 
 # JSON output
 cora jenkins jobs list --format json | jq '.jobs[].name'
+```
+
+### EUR (openEuler Copr)
+
+```bash
+# Get build details
+cora eur build get --build-id 12345
+
+# Get package info
+cora eur package get --ownername mywaaagh_admin --projectname pypi --packagename python-flask-log-request-id
+
+# Get project chroot config
+cora eur project-chroot get --ownername mywaaagh_admin --projectname pypi --chrootname openeuler-22.03_LTS_SP1-x86_64
+
+# JSON output
+cora eur build get --build-id 12345 --format json | jq '.state'
 ```
 
 ### Global Flags
@@ -376,6 +393,14 @@ services:
         username: "your-jenkins-username"
         api_token: "your-jenkins-api-token"          # JENKINS_URL/user/<you>/configure
 
+  # ── EUR / openEuler Copr (built-in spec — no spec_url needed) ──
+  eur:
+    base_url: https://eur.openeuler.openatom.cn/api_3  # required, no default
+    auth:
+      eur:
+        username: "your Copr username"
+        api_token: "your Copr API token"
+
   # ── Forum / Discourse (spec_url required) ──
   forum:
     # spec_url: URL or local path to the service's OpenAPI spec.
@@ -423,6 +448,8 @@ All config values can be overridden by `CORA_`-prefixed environment variables. E
 | `CORA_SERVICES_GITHUB_AUTH_GITHUB_TOKEN` | `services.github.auth.github.token` | GitHub PAT / fine-grained token |
 | `CORA_SERVICES_JENKINS_AUTH_JENKINS_USERNAME` | `services.jenkins.auth.jenkins.username` | Jenkins username |
 | `CORA_SERVICES_JENKINS_AUTH_JENKINS_API_TOKEN` | `services.jenkins.auth.jenkins.api_token` | Jenkins API token |
+| `CORA_SERVICES_EUR_AUTH_EUR_USERNAME` | `services.eur.auth.eur.username` | EUR Copr username |
+| `CORA_SERVICES_EUR_AUTH_EUR_API_TOKEN` | `services.eur.auth.eur.api_token` | EUR Copr API token |
 | `CORA_SERVICES_<NAME>_AUTH_DISCOURSE_API_KEY` | `services.<name>.auth.discourse.api_key` | Discourse API key |
 | `CORA_SERVICES_<NAME>_AUTH_DISCOURSE_API_USERNAME` | `services.<name>.auth.discourse.api_username` | Discourse username |
 

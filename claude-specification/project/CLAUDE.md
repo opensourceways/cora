@@ -238,3 +238,36 @@ go run ./cmd/cora -- <service> <resource> <verb> [flags]  # 直接运行
 | 日志系统设计 | `spec/logging-design.md` |
 | API Token 调研 | `spec/api-token-investigation.md` |
 | CLI 设计参考 | `spec/reference-cli-design-patterns.md` |
+| Spec 优化设计 | `spec/spec-optimization-design.md` |
+
+---
+
+## Smoke 测试规范
+
+### 新增/修改服务时
+
+添加新服务或修改已有服务的 sub-command 后，**必须**同步更新 smoke 测试：
+
+1. **Smoke Scenario 文件** (`scenarios/<service>/<name>.yaml`)
+   - 优先覆盖 **只读接口**（GET 操作），做可达性验证
+   - 每个 scenario 至少包含：`exit_code: 0` + `stdout_not_empty`
+   - `name` 字段必须匹配正则 `^[a-z][a-z0-9\-./]*$`，格式：`<service>/<resource>-<verb>`
+   - 需要外部实例的服务（Etherpad、Jenkins）设置 `skip: true` + `skip_reason`
+
+2. **Smoke Config** (`config/smoke-config.example.yaml`)
+   - 新服务的 auth 使用 `${SMOKE_<SVC>_<FIELD>}` 占位符（由 `os.ExpandEnv` 展开）
+   - 同时在注释区添加对应的 env var 文档
+
+3. **Smoke Workflow** (`.github/workflows/smoke.yml`)
+   - 新服务需要在 `env:` 块添加对应的 `${{ secrets.SMOKE_* }}` 
+   - CI 会从 `smoke-config.example.yaml` 拷贝生成运行时配置
+   - artifacts 需要 `permissions.actions: read` 才能下载
+
+### 本地运行
+
+```bash
+cp config/config.yaml config/smoke-config.yaml   # 用真实凭证替换占位符
+make smoke-build
+./bin/smoke-runner --cora-bin ./bin/cora --config ./config/smoke-config.yaml \
+  --scenarios-dir ./scenarios --report-dir ./smoke-report
+```

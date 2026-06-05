@@ -1,11 +1,15 @@
 name: Smoke Tests
 
+permissions:
+  contents: read
+  actions: read
+
 on:
   schedule:
     - cron: "0 1 * * *"   # Daily at UTC 02:00
   workflow_dispatch:       # Allow manual trigger from the Actions UI
-  push:
-    branches: ["main"]     # Secrets available; also triggers after PR merge
+  pull_request:
+    branches: ["main"]
 
 jobs:
   smoke:
@@ -28,6 +32,9 @@ jobs:
           make build-prod
           go build -o bin/smoke-runner ./cmd/smoke
 
+      - name: Prepare smoke config
+        run: cp ./config/smoke-config.example.yaml ./config/smoke-config.yaml
+
       - name: Run smoke tests
         env:
           SMOKE_GITCODE_TOKEN: ${{ secrets.SMOKE_GITCODE_TOKEN }}
@@ -38,6 +45,8 @@ jobs:
           SMOKE_FORUM_API_KEY: ${{ secrets.SMOKE_FORUM_API_KEY }}
           SMOKE_FORUM_USERNAME: ${{ secrets.SMOKE_FORUM_USERNAME }}
           SMOKE_ETHERPAD_URL: ${{ secrets.SMOKE_ETHERPAD_URL }}
+          SMOKE_EUR_USERNAME: ${{ secrets.SMOKE_EUR_USERNAME }}
+          SMOKE_EUR_API_TOKEN: ${{ secrets.SMOKE_EUR_API_TOKEN }}
           SMOKE_ETHERPAD_API_KEY: ${{ secrets.SMOKE_ETHERPAD_API_KEY }}
         run: |
           ./bin/smoke-runner \

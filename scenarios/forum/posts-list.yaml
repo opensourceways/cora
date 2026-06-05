@@ -1,5 +1,7 @@
 name: "forum/posts-list"
 service: forum
+skip: true
+skip_reason: "Forum instance may be unstable — enable when ready"
 args:
   - posts
   - list

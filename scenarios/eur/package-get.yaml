@@ -1,0 +1,20 @@
+name: "eur/package-get"
+service: eur
+args:
+  - package
+  - get
+  - --ownername
+  - mywaaagh_admin
+  - --projectname
+  - pypi
+  - --packagename
+  - python-flask-log-request-id
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["id", "name", "ownername", "projectname"]
+  - type: json_key_not_empty
+    key: "name"
