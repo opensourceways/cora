@@ -111,9 +111,9 @@ func renderKVTable(obj map[string]interface{}, cols []view.ViewColumn) {
 	for _, col := range cols {
 		val := view.ExtractField(obj, col.Field)
 		rendered := view.FormatValue(val, col)
-			if col.Colorize {
-				rendered = color.State(rendered)
-			}
+		if col.Colorize {
+			rendered = color.State(rendered)
+		}
 		label := view.LabelFor(col)
 		t.Append([]string{label, sanitize(rendered, col.Format)})
 	}
@@ -153,9 +153,9 @@ func renderListTable(items []map[string]interface{}, cols []view.ViewColumn) {
 			val := view.ExtractField(item, col.Field)
 			// In list mode, always collapse multiline to a single line.
 			rendered := view.FormatValue(val, col)
-				if col.Colorize {
-					rendered = color.State(rendered)
-				}
+			if col.Colorize {
+				rendered = color.State(rendered)
+			}
 			rendered = strings.ReplaceAll(rendered, "\n", " ")
 			rendered = strings.ReplaceAll(rendered, "\r", "")
 			row[i] = sanitize(rendered, view.FormatText)
@@ -166,7 +166,6 @@ func renderListTable(items []map[string]interface{}, cols []view.ViewColumn) {
 }
 
 // ── Generic fallback (no ViewConfig) ─────────────────────────────────────────
-
 
 // isColorField reports whether a field name is a known state-like column
 // that should be auto-colorized in the generic fallback renderer.
