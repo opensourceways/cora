@@ -340,5 +340,4 @@ var builtinViews = map[string]map[string]ViewConfig{
 			},
 		},
 	},
-
 }

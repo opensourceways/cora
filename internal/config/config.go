@@ -59,7 +59,7 @@ type AuthConfig struct {
 	Gitcode   *GitcodeAuth   `yaml:"gitcode,omitempty"   mapstructure:"gitcode"`
 	Github    *GithubAuth    `yaml:"github,omitempty"    mapstructure:"github"`
 	Jenkins   *JenkinsAuth   `yaml:"jenkins,omitempty"   mapstructure:"jenkins"`
-	EUR      *EURAuth      `yaml:"eur,omitempty"      mapstructure:"eur"`
+	EUR       *EURAuth       `yaml:"eur,omitempty"      mapstructure:"eur"`
 }
 
 // EtherpadAuth holds the API key for the Etherpad REST API.
