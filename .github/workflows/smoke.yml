@@ -28,6 +28,9 @@ jobs:
           make build-prod
           go build -o bin/smoke-runner ./cmd/smoke
 
+      - name: Prepare smoke config
+        run: cp ./config/smoke-config.example.yaml ./config/smoke-config.yaml
+
       - name: Run smoke tests
         env:
           SMOKE_GITCODE_TOKEN: ${{ secrets.SMOKE_GITCODE_TOKEN }}
