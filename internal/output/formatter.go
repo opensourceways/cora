@@ -10,6 +10,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"
 
+	"github.com/cncf/cora/internal/output/color"
 	"github.com/cncf/cora/internal/view"
 )
 
@@ -110,6 +111,9 @@ func renderKVTable(obj map[string]interface{}, cols []view.ViewColumn) {
 	for _, col := range cols {
 		val := view.ExtractField(obj, col.Field)
 		rendered := view.FormatValue(val, col)
+		if col.Colorize {
+			rendered = color.State(rendered)
+		}
 		label := view.LabelFor(col)
 		t.Append([]string{label, sanitize(rendered, col.Format)})
 	}
@@ -149,6 +153,9 @@ func renderListTable(items []map[string]interface{}, cols []view.ViewColumn) {
 			val := view.ExtractField(item, col.Field)
 			// In list mode, always collapse multiline to a single line.
 			rendered := view.FormatValue(val, col)
+			if col.Colorize {
+				rendered = color.State(rendered)
+			}
 			rendered = strings.ReplaceAll(rendered, "\n", " ")
 			rendered = strings.ReplaceAll(rendered, "\r", "")
 			row[i] = sanitize(rendered, view.FormatText)
@@ -159,6 +166,16 @@ func renderListTable(items []map[string]interface{}, cols []view.ViewColumn) {
 }
 
 // ── Generic fallback (no ViewConfig) ─────────────────────────────────────────
+
+// isColorField reports whether a field name is a known state-like column
+// that should be auto-colorized in the generic fallback renderer.
+func isColorField(name string) bool {
+	switch strings.ToLower(name) {
+	case "state", "status", "result", "color", "phase", "building":
+		return true
+	}
+	return false
+}
 
 func printTable(data []byte) error {
 	var v interface{}
@@ -228,7 +245,11 @@ func printListTable(items []map[string]interface{}) error {
 	for _, item := range items {
 		row := make([]string, len(headers))
 		for i, h := range headers {
-			row[i] = sanitize(stringify(item[h], 60), view.FormatText)
+			val := stringify(item[h], 60)
+			if isColorField(h) {
+				val = color.State(val)
+			}
+			row[i] = sanitize(val, view.FormatText)
 		}
 		t.Append(row)
 	}
@@ -254,7 +275,11 @@ func printKVTable(obj map[string]interface{}) {
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		t.Append([]string{k, sanitize(stringify(obj[k], 200), view.FormatText)})
+		val := stringify(obj[k], 200)
+		if isColorField(k) {
+			val = color.State(val)
+		}
+		t.Append([]string{k, sanitize(val, view.FormatText)})
 	}
 	t.Render()
 }

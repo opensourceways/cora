@@ -28,6 +28,7 @@ type ViewColumn struct {
 	Width    int          `yaml:"width"`    // fixed column width in list mode (0 = auto)
 	DateFmt  string       `yaml:"date_fmt"` // Go time format for FormatDate; default "2006-01-02"
 	Indent   bool         `yaml:"indent"`   // FormatJSON only: use indented pretty-print
+	Colorize bool         `yaml:"colorize"` // apply terminal colors to known state values
 }
 
 // ViewConfig is the complete display configuration for one API operation.

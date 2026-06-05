@@ -252,12 +252,12 @@ func isShortSynonym(pathWord, tagWord string) bool {
 	}
 	// Known synonym pairs: path form is preferred over tag form.
 	synonyms := map[string]string{
-		"pulls":          "pull-requests",
-		"pull-requests":  "pulls",
-		"repos":          "repositories",
-		"repositories":   "repos",
-		"orgs":           "organizations",
-		"organizations":  "orgs",
+		"pulls":         "pull-requests",
+		"pull-requests": "pulls",
+		"repos":         "repositories",
+		"repositories":  "repos",
+		"orgs":          "organizations",
+		"organizations": "orgs",
 	}
 	if v, ok := synonyms[pathWord]; ok && v == tagWord {
 		return true
@@ -340,7 +340,7 @@ var httpMethodSuffixes = []string{
 //     Skipped for path-encoded operationIds (GitCode style: get_api_v5_…)
 //  3. Action segment after a path param: /{id}/lock.json → "lock"
 //     Applies when up to 4 non-param segments precede the {param}/action pair.
-//  3.5 For path-encoded operationIds (GitCode style), extract the HTTP
+//     3.5 For path-encoded operationIds (GitCode style), extract the HTTP
 //     method prefix to recover the lost verb signal. This runs after
 //     Priority 3 so action segments (e.g. "assignees") take precedence
 //     over the generic method-based verb.
@@ -391,8 +391,7 @@ func verbName(opID, method, path string) string {
 		}
 	}
 
-	
-// Priority 3.5: for path-encoded operationIds (GitCode style), extract
+	// Priority 3.5: for path-encoded operationIds (GitCode style), extract
 	// the HTTP method prefix to recover the lost verb signal.
 	// e.g. "get_api_v5_user" -> "get" (or "list" if no trailing param).
 	if isPathEncodedOpID(opID) {
