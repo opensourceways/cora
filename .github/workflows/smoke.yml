@@ -1,5 +1,9 @@
 name: Smoke Tests
 
+permissions:
+  contents: read
+  actions: read
+
 on:
   schedule:
     - cron: "0 1 * * *"   # Daily at UTC 02:00
