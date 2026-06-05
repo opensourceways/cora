@@ -1,8 +1,8 @@
-name: "gitcode/repos-list"
+name: "gitcode/orgs-repos"
 service: gitcode
 args:
-  - organizations
-  - list-org-repos
+  - orgs
+  - repos
   - --org
   - openeuler
 format: table
