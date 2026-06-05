@@ -39,14 +39,14 @@ services:
 
   forum:
     spec_url: assets/openapi/forum/openapi.json
-    base_url: https://YOUR_DISCOURSE_INSTANCE
+    base_url: ${SMOKE_FORUM_URL}
     auth:
       discourse:
         api_key: ${SMOKE_FORUM_API_KEY}
         api_username: ${SMOKE_FORUM_USERNAME}
 
   etherpad:
-    base_url: https://YOUR_ETHERPAD/api/1.3.0
+    base_url: ${SMOKE_ETHERPAD_URL}
     auth:
       etherpad:
         api_key: ${SMOKE_ETHERPAD_API_KEY}
