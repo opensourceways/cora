@@ -236,10 +236,25 @@ func normalizeTag(tag, path string) string {
 			continue
 		}
 		if isShortSynonym(sl, candidate) {
+			// Map singular path segments to canonical plural form.
+			canonical := map[string]string{"repo": "repos", "org": "orgs"}
+			if c, ok := canonical[sl]; ok {
+				return c
+			}
 			return sl
 		}
 	}
 
+	// If no path segment matched, map known tag forms to canonical equivalents
+	// (e.g. "repositories" → "repos", "organizations" → "orgs").
+	canonicalTag := map[string]string{
+		"repositories":  "repos",
+		"organizations": "orgs",
+		"pull-requests": "pulls",
+	}
+	if c, ok := canonicalTag[candidate]; ok {
+		return c
+	}
 	return candidate
 }
 

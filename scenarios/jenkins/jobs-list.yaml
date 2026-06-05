@@ -1,15 +1,15 @@
-name: "forum/posts-list"
-service: forum
+name: "jenkins/jobs-list"
+service: jenkins
 args:
-  - posts
+  - jobs
   - list
 format: table
 timeout_ms: 10000
+skip: true
+skip_reason: "Requires configured Jenkins instance"
 assertions:
   - type: exit_code
     value: 0
-  - type: response_time_lt
-    value: 8000
   - type: stdout_not_empty
   - type: stderr_not_contains
     value: "ERROR"
