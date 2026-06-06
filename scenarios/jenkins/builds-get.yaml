@@ -1,0 +1,20 @@
+name: "jenkins/builds-get"
+service: jenkins
+args:
+  - builds
+  - get
+  - --name
+  - "multiarch/job/src-openeuler/job/x86-64/job/llvm-toolset-20"
+  - --number
+  - 38
+format: json
+timeout_ms: 10000
+skip: true
+skip_reason: "Requires configured Jenkins instance with build history"
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["number", "result", "building"]
+  - type: json_key_not_empty
+    key: "result"

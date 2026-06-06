@@ -1,0 +1,16 @@
+name: "gitcode/users-get"
+service: gitcode
+args:
+  - users
+  - get
+  - --username
+  - TommyLike
+format: json
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["login", "name", "id"]
+  - type: json_key_not_empty
+    key: "login"

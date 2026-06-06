@@ -1,0 +1,18 @@
+name: "gitcode/repos-get"
+service: gitcode
+args:
+  - repos
+  - get
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+format: json
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["full_name", "description", "default_branch"]
+  - type: json_key_not_empty
+    key: "full_name"
