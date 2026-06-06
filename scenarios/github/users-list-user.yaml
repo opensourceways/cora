@@ -1,4 +1,6 @@
 name: "github/users-list-user"
+skip: true
+skip_reason: "GET /user requires full user-scope token — enable when configured"
 service: github
 args:
   - users
