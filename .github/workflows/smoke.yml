@@ -41,6 +41,9 @@ jobs:
           SMOKE_GITCODE_OWNER: ${{ secrets.SMOKE_GITCODE_OWNER }}
           SMOKE_GITCODE_REPO: ${{ secrets.SMOKE_GITCODE_REPO }}
           SMOKE_GITCODE_ISSUE_NUMBER: ${{ secrets.SMOKE_GITCODE_ISSUE_NUMBER }}
+          SMOKE_GITHUB_TOKEN: ${{ secrets.SMOKE_GITHUB_TOKEN }}
+          SMOKE_GITHUB_OWNER: ${{ secrets.SMOKE_GITHUB_OWNER }}
+          SMOKE_GITHUB_REPO: ${{ secrets.SMOKE_GITHUB_REPO }}
           SMOKE_FORUM_URL: ${{ secrets.SMOKE_FORUM_URL }}
           SMOKE_FORUM_API_KEY: ${{ secrets.SMOKE_FORUM_API_KEY }}
           SMOKE_FORUM_USERNAME: ${{ secrets.SMOKE_FORUM_USERNAME }}

@@ -1,0 +1,20 @@
+name: "gitcode/pulls-get"
+service: gitcode
+args:
+  - pulls
+  - get
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+  - --number
+  - 480
+format: json
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["title", "state", "number", "user", "created_at"]
+  - type: json_key_not_empty
+    key: "title"

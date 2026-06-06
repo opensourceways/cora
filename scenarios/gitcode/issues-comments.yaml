@@ -1,0 +1,19 @@
+name: "gitcode/issues-comments"
+service: gitcode
+args:
+  - issues
+  - comments
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+  - --number
+  - 404
+format: table
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: stdout_not_empty
+  - type: stderr_not_contains
+    value: "ERROR"

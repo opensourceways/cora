@@ -1,0 +1,18 @@
+name: "forum/topics-get"
+skip: true
+skip_reason: "Forum instance may be unstable — enable when ready"
+service: forum
+args:
+  - topics
+  - get
+  - --id
+  - 1
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["title", "id", "created_at"]
+  - type: json_key_not_empty
+    key: "title"

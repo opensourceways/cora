@@ -1,0 +1,20 @@
+name: "github/pulls-get"
+service: github
+args:
+  - pulls
+  - get
+  - --owner
+  - opensourceways
+  - --repo
+  - cora
+  - --pull-number
+  - 3
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["title", "state", "number", "user", "created_at"]
+  - type: json_key_not_empty
+    key: "title"
