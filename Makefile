@@ -118,7 +118,7 @@ smoke-filter: build-prod smoke-build
 RELEASE_VERSION ?= $(VERSION)
 DIST_DIR      := dist
 RELEASE_DIR   := $(DIST_DIR)/cora-$(RELEASE_VERSION)
-PLATFORMS     := darwin/amd64 darwin/arm64 linux/amd64 linux/arm64
+PLATFORMS     := darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 windows/amd64
 
 .PHONY: release
 release: clean build-prod
@@ -126,24 +126,27 @@ release: clean build-prod
 	@mkdir -p $(RELEASE_DIR)
 	@# Copy source
 	@cp -R go.mod go.sum Makefile cmd internal pkg assets config scenarios spec readme.md readme_en.md $(RELEASE_DIR)
-	@rm -rf $(RELEASE_DIR)/config/config.yaml $(RELEASE_DIR)/config/smoke-config.yaml
+	@rm -rf $(RELEASE_DIR)/config/config.yaml $(RELEASE_DIR)/config/smoke-config.yaml $(RELEASE_DIR)/config/views.yaml
+	@rm -f $(RELEASE_DIR)/assets/img/cora.png
 	@# Build per platform
 	@for p in $(PLATFORMS); do \
 		goos=$$(echo $$p | cut -d/ -f1); \
 		goarch=$$(echo $$p | cut -d/ -f2); \
-		out=$(RELEASE_DIR)/cora-$$goos-$$goarch; \
+		out=$(DIST_DIR)/cora-$$goos-$$goarch; \
+			if [ "$$goos" = "windows" ]; then out="$$out.exe"; fi; \
 		CGO_ENABLED=0 GOOS=$$goos GOARCH=$$goarch go build -ldflags "$(LDFLAGS) -s -w" -o $$out $(CMD); \
 		echo "  built: $$out"; \
 	done
-	@# Package source tarball
+	@# Package source tarball (RELEASE_DIR has source only, no binaries).
 	@echo "Creating source archive..."
-	@tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).src.tar.gz -C $(DIST_DIR) cora-$(RELEASE_VERSION)
+	@tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).src.tar.gz --exclude='.git' -C $(DIST_DIR) cora-$(RELEASE_VERSION)
 	@# Package per-platform binary tarballs
 	@for p in $(PLATFORMS); do \
 		goos=$$(echo $$p | cut -d/ -f1); \
 		goarch=$$(echo $$p | cut -d/ -f2); \
 		binary=cora-$$goos-$$goarch; \
-		tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).$$goos-$$goarch.tar.gz -C $(RELEASE_DIR) $$binary; \
+			if [ "$$goos" = "windows" ]; then binary="$$binary.exe"; fi; \
+		tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).$$goos-$$goarch.tar.gz -C $(DIST_DIR) $$binary; \
 		echo "  archive: $(DIST_DIR)/cora-$(RELEASE_VERSION).$$goos-$$goarch.tar.gz"; \
 	done
 	@echo "Release $(RELEASE_VERSION) built in $(DIST_DIR)/"

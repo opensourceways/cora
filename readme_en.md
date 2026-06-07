@@ -316,12 +316,36 @@ User views completely replace the matching built-in view (whole replacement, no 
 
 ## Installation
 
+### Download prebuilt binary
+
+Download from [GitHub Releases](https://github.com/opensourceways/cora/releases):
+
+```bash
+# Linux amd64
+curl -LO https://github.com/opensourceways/cora/releases/download/v0.8/cora-v0.8.linux-amd64.tar.gz
+tar xzf cora-v0.8.linux-amd64.tar.gz
+sudo mv cora-linux-amd64 /usr/local/bin/cora
+
+# macOS Apple Silicon
+curl -LO https://github.com/opensourceways/cora/releases/download/v0.8/cora-v0.8.darwin-arm64.tar.gz
+tar xzf cora-v0.8.darwin-arm64.tar.gz
+sudo mv cora-darwin-arm64 /usr/local/bin/cora
+```
+
+Supported platforms:
+
+| Platform | Architectures |
+|----------|--------------|
+| Linux | amd64, arm64 |
+| macOS | amd64 (Intel), arm64 (Apple Silicon) |
+| Windows | amd64 |
+
 ### Build from source
 
 **Requirements:** Go 1.22+, make
 
 ```bash
-git clone https://github.com/cncf/cora.git
+git clone https://github.com/opensourceways/cora.git
 cd cora
 make build
 mv bin/cora /usr/local/bin/
@@ -330,7 +354,6 @@ mv bin/cora /usr/local/bin/
 ### Docker
 
 ```bash
-# Build the image
 make docker-build
 
 # Run with your local config directory mounted

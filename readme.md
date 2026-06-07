@@ -323,12 +323,36 @@ gitcode:
 
 ## 安装
 
+### 下载预编译二进制
+
+从 [GitHub Releases](https://github.com/opensourceways/cora/releases) 下载对应平台的二进制包，解压后放入 `PATH`：
+
+```bash
+# 以 Linux amd64 为例
+curl -LO https://github.com/opensourceways/cora/releases/download/v0.8/cora-v0.8.linux-amd64.tar.gz
+tar xzf cora-v0.8.linux-amd64.tar.gz
+sudo mv cora-linux-amd64 /usr/local/bin/cora
+
+# macOS Apple Silicon
+curl -LO https://github.com/opensourceways/cora/releases/download/v0.8/cora-v0.8.darwin-arm64.tar.gz
+tar xzf cora-v0.8.darwin-arm64.tar.gz
+sudo mv cora-darwin-arm64 /usr/local/bin/cora
+```
+
+支持的平台：
+
+| 平台 | 架构 | 适用 |
+|------|------|------|
+| Linux | amd64 / arm64 | 服务器、树莓派 |
+| macOS | amd64 / arm64 | Intel Mac / Apple Silicon |
+| Windows | amd64 | Windows x64 |
+
 ### 从源码构建
 
 **环境要求：** Go 1.22+、make
 
 ```bash
-git clone https://github.com/cncf/cora.git
+git clone https://github.com/opensourceways/cora.git
 cd cora
 make build
 mv bin/cora /usr/local/bin/
@@ -337,19 +361,11 @@ mv bin/cora /usr/local/bin/
 ### 使用 Docker
 
 ```bash
-# 构建镜像
 make docker-build
 
-# 运行（挂载本地配置目录）
 docker run --rm \
   -v ~/.config/cora:/root/.config/cora:ro \
   cora:latest forum posts list
-```
-
-或使用 `make docker-run`：
-
-```bash
-make docker-run ARGS="forum posts list"
 ```
 
 ## 配置
@@ -751,6 +767,27 @@ internal/smoke/
 ## 架构文档
 
 完整架构设计（含框架选型、OpenAPI 驱动命令生成、鉴权策略、Spec 缓存、View 系统等）请参阅 [`spec/`](spec/) 目录。
+
+## 发布
+
+维护者发布新版本：
+
+```bash
+# 1. 确保在 main 分支，工作区干净
+git checkout main
+git pull origin main
+
+# 2. 本地构建验证
+make release RELEASE_VERSION=v0.9
+
+# 3. 打 tag 并推送（GitHub Actions 自动构建 + 发布）
+git tag -a v0.9 -m "v0.9: 版本说明"
+git push origin v0.9
+```
+
+Push tag 后 `.github/workflows/release.yml` 自动触发：
+- 交叉编译 5 个平台（darwin/linux/windows × amd64/arm64）
+- 打包 `.tar.gz` 并上传到 [GitHub Releases](https://github.com/opensourceways/cora/releases)
 
 ## 贡献
 
