@@ -1,0 +1,16 @@
+name: "github/pulls-comments"
+service: github
+args:
+  - pulls
+  - comments
+  - --owner
+  - opensourceways
+  - --repo
+  - cora
+  - --pull-number
+  - 3
+format: table
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0

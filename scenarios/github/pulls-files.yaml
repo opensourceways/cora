@@ -1,0 +1,17 @@
+name: "github/pulls-files"
+service: github
+args:
+  - pulls
+  - files
+  - --owner
+  - opensourceways
+  - --repo
+  - cora
+  - --pull-number
+  - 3
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: stdout_not_empty

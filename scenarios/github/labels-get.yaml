@@ -1,0 +1,20 @@
+name: "github/labels-get"
+service: github
+args:
+  - labels
+  - get
+  - --owner
+  - opensourceways
+  - --repo
+  - cora
+  - --name
+  - bug
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["name", "color", "description"]
+  - type: json_key_not_empty
+    key: "name"

@@ -1,0 +1,16 @@
+name: "github/orgs-get"
+service: github
+args:
+  - orgs
+  - get
+  - --org
+  - opensourceways
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["login", "description"]
+  - type: json_key_not_empty
+    key: "login"

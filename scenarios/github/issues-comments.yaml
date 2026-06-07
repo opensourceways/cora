@@ -1,0 +1,16 @@
+name: "github/issues-comments"
+service: github
+args:
+  - issues
+  - comments
+  - --owner
+  - opensourceways
+  - --repo
+  - cora
+  - --issue-number
+  - 1
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
