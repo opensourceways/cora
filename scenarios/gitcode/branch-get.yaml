@@ -1,0 +1,20 @@
+name: "gitcode/branch-get"
+service: gitcode
+args:
+  - branch
+  - get
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+  - --branch
+  - master
+format: json
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["name", "protected"]
+  - type: json_key_not_empty
+    key: "name"

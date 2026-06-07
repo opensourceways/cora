@@ -1,0 +1,14 @@
+name: "gitcode/comments-list"
+service: gitcode
+args:
+  - comments
+  - list
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+format: json
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
