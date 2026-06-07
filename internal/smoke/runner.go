@@ -202,4 +202,3 @@ func (r *Runner) runParallel(scenarios []Scenario, configPath string) *RunReport
 	report.TotalDurationMs = time.Since(tStart).Milliseconds()
 	return report
 }
-
