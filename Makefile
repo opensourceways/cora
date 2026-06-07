@@ -129,7 +129,7 @@ release: clean build-prod
 	@rm -rf $(RELEASE_DIR)/config/config.yaml $(RELEASE_DIR)/config/smoke-config.yaml $(RELEASE_DIR)/config/views.yaml
 	@rm -f $(RELEASE_DIR)/assets/img/cora.png
 	@# Build per platform
-	@for p in $(PLATFORMS); do \
+	@set -e; for p in $(PLATFORMS); do \
 		goos=$$(echo $$p | cut -d/ -f1); \
 		goarch=$$(echo $$p | cut -d/ -f2); \
 		out=$(DIST_DIR)/cora-$$goos-$$goarch; \
@@ -141,7 +141,7 @@ release: clean build-prod
 	@echo "Creating source archive..."
 	@tar -czf $(DIST_DIR)/cora-$(RELEASE_VERSION).src.tar.gz --exclude='.git' -C $(DIST_DIR) cora-$(RELEASE_VERSION)
 	@# Package per-platform binary tarballs
-	@for p in $(PLATFORMS); do \
+	@set -e; for p in $(PLATFORMS); do \
 		goos=$$(echo $$p | cut -d/ -f1); \
 		goarch=$$(echo $$p | cut -d/ -f2); \
 		binary=cora-$$goos-$$goarch; \
