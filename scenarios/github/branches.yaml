@@ -1,14 +1,14 @@
-name: "gitcode/branch-list"
-service: gitcode
+name: "github/branches"
+service: github
 args:
   - branch
   - branches
   - --owner
-  - openeuler
+  - opensourceways
   - --repo
-  - infrastructure
-format: table
-timeout_ms: 8000
+  - cora
+format: json
+timeout_ms: 10000
 assertions:
   - type: exit_code
     value: 0

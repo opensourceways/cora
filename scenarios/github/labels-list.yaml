@@ -1,14 +1,14 @@
-name: "gitcode/labels-list"
-service: gitcode
+name: "github/labels-list"
+service: github
 args:
   - labels
   - list
   - --owner
-  - openeuler
+  - opensourceways
   - --repo
-  - infrastructure
-format: table
-timeout_ms: 8000
+  - cora
+format: json
+timeout_ms: 10000
 assertions:
   - type: exit_code
     value: 0
