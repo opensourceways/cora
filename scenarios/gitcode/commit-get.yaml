@@ -1,0 +1,20 @@
+name: "gitcode/commit-get"
+service: gitcode
+args:
+  - commit
+  - get
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+  - --sha
+  - a63ae4a0b5c40dd12f70263e23c05bbbeb888fb6
+format: json
+timeout_ms: 8000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["sha", "commit", "html_url"]
+  - type: json_key_not_empty
+    key: "sha"

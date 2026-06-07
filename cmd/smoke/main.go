@@ -24,6 +24,7 @@ func run() error {
 	scenariosDir := flag.String("scenarios-dir", "./scenarios", "directory containing scenario YAML files")
 	reportDir := flag.String("report-dir", "./smoke-report", "directory to write report.html into")
 	filter := flag.String("filter", "", "only run scenarios whose name or service contains this string")
+	parallel := flag.Int("parallel", 4, "max parallel service groups (0 = sequential)")
 	verbose := flag.Bool("verbose", false, "print stdout/stderr for every scenario, not just failures")
 	flag.Parse()
 
@@ -67,7 +68,7 @@ func run() error {
 	fmt.Printf("Running %d scenario(s)...\n\n", len(scenarios))
 
 	// Execute all scenarios.
-	runner := smoke.NewRunner(*coraBin, expandedConfig, *verbose)
+	runner := smoke.NewRunner(*coraBin, expandedConfig, *verbose, *parallel)
 	report := runner.RunAll(scenarios, *configPath)
 
 	// Print live results.

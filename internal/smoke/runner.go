@@ -6,20 +6,28 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
 // Runner executes scenarios by invoking the cora binary as a subprocess.
 type Runner struct {
-	coraBin    string // path to cora binary
-	configPath string // expanded config file path (may be empty)
-	verbose    bool   // pass --verbose to every cora invocation
+	coraBin       string // path to cora binary
+	configPath    string // expanded config file path (may be empty)
+	verbose       bool   // pass --verbose to every cora invocation
+	maxConcurrent int    // max parallel service groups (0 = sequential)
 }
 
 // NewRunner creates a Runner. configPath may be "" to skip CORA_CONFIG injection.
-func NewRunner(coraBin, configPath string, verbose bool) *Runner {
-	return &Runner{coraBin: coraBin, configPath: configPath, verbose: verbose}
+// maxConcurrent controls parallel execution: 0 = sequential, >0 = run up to N
+// service groups concurrently.
+func NewRunner(coraBin, configPath string, verbose bool, maxConcurrent int) *Runner {
+	return &Runner{
+		coraBin: coraBin, configPath: configPath, verbose: verbose,
+		maxConcurrent: maxConcurrent,
+	}
 }
 
 // Run executes a single Scenario and returns its result.
@@ -103,16 +111,94 @@ func (r *Runner) Run(s Scenario) ScenarioResult {
 	return result
 }
 
-// RunAll executes all scenarios sequentially and returns a RunReport.
+// RunAll executes all scenarios and returns a RunReport.
+// When MaxConcurrent > 0, scenarios are grouped by service and service groups
+// run in parallel (up to MaxConcurrent at a time). Scenarios within a group
+// still run sequentially to avoid rate-limiting the same API.
 func (r *Runner) RunAll(scenarios []Scenario, configPath string) *RunReport {
+	if r.maxConcurrent <= 0 {
+		return r.runSequential(scenarios, configPath)
+	}
+	return r.runParallel(scenarios, configPath)
+}
+
+// runSequential executes all scenarios one-by-one.
+func (r *Runner) runSequential(scenarios []Scenario, configPath string) *RunReport {
 	report := &RunReport{
 		GeneratedAt: time.Now().Format("2006-01-02 15:04:05"),
 		ConfigPath:  configPath,
 	}
-	start := time.Now()
+	tStart := time.Now()
 	for _, s := range scenarios {
 		report.Results = append(report.Results, r.Run(s))
 	}
-	report.TotalDurationMs = time.Since(start).Milliseconds()
+	report.TotalDurationMs = time.Since(tStart).Milliseconds()
+	return report
+}
+
+// runParallel groups scenarios by service, then runs service groups in
+// parallel (up to MaxConcurrent). Scenarios within each group run sequentially
+// to avoid overwhelming a single API with concurrent requests.
+func (r *Runner) runParallel(scenarios []Scenario, configPath string) *RunReport {
+	tStart := time.Now()
+	// Group by service, preserving order within each group.
+	groups := make(map[string][]Scenario)
+	var serviceOrder []string
+	for _, s := range scenarios {
+		if _, ok := groups[s.Service]; !ok {
+			serviceOrder = append(serviceOrder, s.Service)
+		}
+		groups[s.Service] = append(groups[s.Service], s)
+	}
+
+	// Assign each scenario an index for deterministic output ordering.
+	origIdx := make(map[string]int)
+	for i, s := range scenarios {
+		origIdx[s.Name] = i
+	}
+
+	type indexedResult struct {
+		idx    int
+		result ScenarioResult
+	}
+
+	resultCh := make(chan indexedResult, len(scenarios))
+	sem := make(chan struct{}, r.maxConcurrent)
+	var wg sync.WaitGroup
+
+	for _, svc := range serviceOrder {
+		wg.Add(1)
+		go func(svcName string, svcScenarios []Scenario) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			for _, s := range svcScenarios {
+				res := r.Run(s)
+				resultCh <- indexedResult{idx: origIdx[s.Name], result: res}
+			}
+		}(svc, groups[svc])
+	}
+
+	go func() {
+		wg.Wait()
+		close(resultCh)
+	}()
+
+	// Collect and sort by original index.
+	var indexed []indexedResult
+	for ir := range resultCh {
+		indexed = append(indexed, ir)
+	}
+	sort.Slice(indexed, func(i, j int) bool { return indexed[i].idx < indexed[j].idx })
+
+	report := &RunReport{
+		GeneratedAt: time.Now().Format("2006-01-02 15:04:05"),
+		ConfigPath:  configPath,
+	}
+	for _, ir := range indexed {
+		report.Results = append(report.Results, ir.result)
+	}
+	report.TotalDurationMs = time.Since(tStart).Milliseconds()
 	return report
 }

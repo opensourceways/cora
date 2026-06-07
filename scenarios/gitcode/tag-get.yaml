@@ -1,0 +1,17 @@
+name: "gitcode/tag-get"
+service: gitcode
+args:
+  - tag
+  - list
+  - --owner
+  - openeuler
+  - --repo
+  - infrastructure
+format: table
+timeout_ms: 8000
+skip: true
+skip_reason: "Protected tag API requires admin permissions"
+assertions:
+  - type: exit_code
+    value: 0
+  - type: stdout_not_empty
