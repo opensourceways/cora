@@ -21,8 +21,9 @@ type Entry struct {
 	// BaseURL is the API root address from the config.
 	BaseURL string
 	// SpecURL is the OpenAPI spec source from the config.
-	SpecURL string
-	loader  *spec.Loader
+	SpecURL    string
+	loader     *spec.Loader
+	normalizer *spec.Normalizer // nil = no normalization
 }
 
 // Registry maps service names → Entry.
@@ -113,9 +114,17 @@ func (r *Registry) Entries() []*Entry {
 	return entries
 }
 
-// LoadSpec fetches (or returns cached) OpenAPI spec for the entry.
+// LoadSpec fetches (or returns cached) OpenAPI spec for the entry,
+// applying any registered normalization rules.
 func (e *Entry) LoadSpec(ctx context.Context) (*openapi3.T, error) {
-	return e.loader.Load(ctx)
+	raw, err := e.loader.Load(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if e.normalizer != nil {
+		return e.normalizer.Normalize(raw), nil
+	}
+	return raw, nil
 }
 
 // LoadCached reads the spec from the local cache only — no network call.
