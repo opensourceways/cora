@@ -1,18 +1,18 @@
-name: "forum/topics-get"
+name: "forum/users-get-admin"
 skip: true
 skip_reason: "Forum instance IP whitelist not configured for CI runner — enable when network access is granted"
 service: forum
 args:
-  - topics
-  - get
-  - --id
-  - 1
+  - "users"
+  - "get-admin"
+  - "--id"
+  - "1"
 format: json
 timeout_ms: 10000
 assertions:
   - type: exit_code
     value: 0
   - type: json_has_keys
-    values: ["title", "id", "created_at"]
+    values: ["id", "username"]
   - type: json_key_not_empty
-    key: "title"
+    key: "username"

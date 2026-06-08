@@ -1,18 +1,18 @@
-name: "forum/topics-get"
+name: "forum/tags-get-tag-group"
 skip: true
 skip_reason: "Forum instance IP whitelist not configured for CI runner — enable when network access is granted"
 service: forum
 args:
-  - topics
-  - get
-  - --id
-  - 1
+  - "tags"
+  - "get-tag-group"
+  - "--id"
+  - "1"
 format: json
 timeout_ms: 10000
 assertions:
   - type: exit_code
     value: 0
   - type: json_has_keys
-    values: ["title", "id", "created_at"]
+    values: ["tag_group"]
   - type: json_key_not_empty
-    key: "title"
+    key: "tag_group"
