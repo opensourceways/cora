@@ -110,10 +110,11 @@ func DetectItems(raw []byte, cfg *ViewConfig) ([]map[string]interface{}, map[str
 		return nil, nil
 	}
 
-	// Apply explicit root_field.
+	// Apply explicit root_field. Supports dot-separated nested paths
+	// (e.g. "topic_list.topics").
 	if cfg != nil && cfg.RootField != "" {
 		if obj, ok := v.(map[string]interface{}); ok {
-			v = obj[cfg.RootField]
+			v = ExtractField(obj, cfg.RootField)
 		}
 	}
 

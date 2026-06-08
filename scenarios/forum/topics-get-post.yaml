@@ -1,0 +1,18 @@
+name: "forum/topics-get-post"
+skip: true
+skip_reason: "OpenAPI spec defines post_ids as body param but Discourse expects query param — GET with body causes 413"
+service: forum
+args:
+  - "topics"
+  - "get-post"
+  - "--id"
+  - "1"
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["id", "post_stream"]
+  - type: json_key_not_empty
+    key: "id"

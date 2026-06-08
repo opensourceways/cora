@@ -1,0 +1,18 @@
+name: "forum/topics-get-external-id"
+skip: true
+skip_reason: "No known valid external_id on test instance — enable when test data is available"
+service: forum
+args:
+  - "topics"
+  - "get-external-id"
+  - "--external-id"
+  - "1"
+format: json
+timeout_ms: 10000
+assertions:
+  - type: exit_code
+    value: 0
+  - type: json_has_keys
+    values: ["id", "title"]
+  - type: json_key_not_empty
+    key: "title"

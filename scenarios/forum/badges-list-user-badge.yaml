@@ -1,10 +1,12 @@
-name: "forum/topics-list"
+name: "forum/badges-list-user-badge"
 skip: true
 skip_reason: "Forum instance IP whitelist not configured for CI runner — enable when network access is granted"
 service: forum
 args:
-  - topics
-  - list
+  - "badges"
+  - "list-user-badge"
+  - "--username"
+  - "system"
 format: table
 timeout_ms: 10000
 assertions:
