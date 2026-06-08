@@ -128,6 +128,46 @@ cora/
 | 发布 | `Release` | `Releases` |
 | Webhook | `Webhooks` | - |
 
+### Spec Normalizer（服务注册时声明）
+
+Spec 质量问题通过 `NormalizeRule` 在服务注册时声明式修正，**禁止**在 `command.go` 中为特定服务编写 if/else 补丁。
+
+```go
+// internal/registry/builtin.go — 服务注册示例
+addBuiltin(r, cfg, builtinDef{
+    name:      "myservice",
+    specData:  assets.MyServiceSpec,
+    normalize: spec.NormalizeRule{
+        // 资源别名：tag kebab 形式 → 规范资源名
+        ResourceAlias: map[string]string{
+            "repositories": "repos",
+        },
+        // Tag 重分配：path 前缀匹配 → 修正 tag
+        TagReassign: []spec.TagReassignRule{
+            {PathPrefix: "/repos/{o}/{r}/pulls", Tag: "Pulls"},
+        },
+        // GitCode 风格 path-encoded operationId verb 提取
+        OpIDVerbExtract: true,
+        // 为无 tag 的操作添加 tag
+        AddMissingTags: []spec.MissingTagRule{
+            {PathPrefix: "/createPad", Tag: "pad"},
+        },
+    },
+})
+```
+
+**规则类型**：
+
+| 规则 | 用途 | 何时使用 |
+|------|------|---------|
+| `ResourceAlias` | tag → 规范资源名映射 | 同一概念不同命名（repositories→repos） |
+| `TagReassign` | path 前缀 → 修正 tag | spec 作者错标 tag 时 |
+| `OpIDVerbExtract` | 提取 path-encoded opId 的 verb | GitCode 风格 `get_api_v5_*` opId |
+| `AddMissingTags` | 为无 tag 操作分配 tag | spec 中部分操作缺少 tag 时 |
+| `TagRemap` | 直接重命名 tag | 多词 tag（"Pull Requests"→"Pulls"） |
+
+**禁止**：在 `command.go` 的 `resourceName()`、`verbName()`、`Build()` 等函数中硬编码特定服务的修正逻辑。
+
 ---
 
 ## 日志规范（项目特有）
@@ -240,6 +280,7 @@ go run ./cmd/cora -- <service> <resource> <verb> [flags]  # 直接运行
 | 日志系统设计 | `spec/logging-design.md` |
 | API Token 调研 | `spec/api-token-investigation.md` |
 | CLI 设计参考 | `spec/reference-cli-design-patterns.md` |
+| Spec Normalizer 设计 | `spec/spec-normalizer-design.md` |
 
 ---
 

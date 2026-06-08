@@ -8,6 +8,44 @@ import (
 	"github.com/opensourceways/cora/internal/spec"
 )
 
+var (
+	// gitcodeNormalize fixes known quality issues in the GitCode OpenAPI spec.
+	gitcodeNormalize = spec.NormalizeRule{
+		ResourceAlias: map[string]string{
+			"repositories":  "repos",
+			"organizations": "orgs",
+			"pull-requests": "pulls",
+		},
+		TagReassign: []spec.TagReassignRule{
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/pulls", Tag: "Pulls"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/issues", Tag: "Issues"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/labels", Tag: "Labels"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/branches", Tag: "Branch"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/tags", Tag: "Tag"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/releases", Tag: "Release"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}/milestones", Tag: "Milestone"},
+		},
+		OpIDVerbExtract: true,
+	}
+
+	// etherpadNormalize assigns tags to untagged operations.
+	etherpadNormalize = spec.NormalizeRule{
+		AddMissingTags: []spec.MissingTagRule{
+			{PathPrefix: "/appendText", Tag: "pad"},
+			{PathPrefix: "/copyPad", Tag: "pad"},
+			{PathPrefix: "/getAttributePool", Tag: "pad"},
+			{PathPrefix: "/getPadID", Tag: "pad"},
+			{PathPrefix: "/getRevisionChangeset", Tag: "pad"},
+			{PathPrefix: "/getSavedRevisionsCount", Tag: "pad"},
+			{PathPrefix: "/getStats", Tag: "pad"},
+			{PathPrefix: "/listSavedRevisions", Tag: "pad"},
+			{PathPrefix: "/movePad", Tag: "pad"},
+			{PathPrefix: "/restoreRevision", Tag: "pad"},
+			{PathPrefix: "/saveRevision", Tag: "pad"},
+		},
+	}
+)
+
 const (
 	etherpadName = "etherpad"
 	gitcodeName  = "gitcode"
@@ -31,17 +69,19 @@ func registerBuiltins(r *Registry, cfg *config.Config) {
 	}
 
 	addBuiltin(r, cfg, builtinDef{
-		name:     etherpadName,
-		specData: assets.EtherpadSpec,
-		cacheDir: cacheDir,
-		ttl:      ttl,
+		name:      etherpadName,
+		specData:  assets.EtherpadSpec,
+		cacheDir:  cacheDir,
+		ttl:       ttl,
+		normalize: etherpadNormalize,
 	})
 
 	addBuiltin(r, cfg, builtinDef{
-		name:     gitcodeName,
-		specData: assets.GitcodeSpec,
-		cacheDir: cacheDir,
-		ttl:      ttl,
+		name:      gitcodeName,
+		specData:  assets.GitcodeSpec,
+		cacheDir:  cacheDir,
+		ttl:       ttl,
+		normalize: gitcodeNormalize,
 	})
 
 	addBuiltin(r, cfg, builtinDef{
@@ -67,10 +107,11 @@ func registerBuiltins(r *Registry, cfg *config.Config) {
 }
 
 type builtinDef struct {
-	name     string
-	specData []byte
-	cacheDir string
-	ttl      time.Duration
+	name      string
+	specData  []byte
+	cacheDir  string
+	ttl       time.Duration
+	normalize spec.NormalizeRule
 }
 
 func addBuiltin(r *Registry, cfg *config.Config, b builtinDef) {
@@ -82,10 +123,11 @@ func addBuiltin(r *Registry, cfg *config.Config, b builtinDef) {
 	}
 
 	r.entries[b.name] = &Entry{
-		Name:    b.name,
-		BaseURL: baseURL,
-		SpecURL: "", // embedded spec — no remote URL needed
-		loader:  spec.NewEmbeddedLoader(b.name, b.specData, b.cacheDir, b.ttl),
+		Name:       b.name,
+		BaseURL:    baseURL,
+		SpecURL:    "", // embedded spec — no remote URL needed
+		loader:     spec.NewEmbeddedLoader(b.name, b.specData, b.cacheDir, b.ttl),
+		normalizer: spec.NewNormalizer(b.normalize),
 	}
 
 	// Ensure cfg.Services contains an entry for this built-in so the executor
