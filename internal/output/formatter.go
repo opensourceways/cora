@@ -10,8 +10,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"
 
-	"github.com/cncf/cora/internal/output/color"
-	"github.com/cncf/cora/internal/view"
+	"github.com/opensourceways/cora/internal/output/color"
+	"github.com/opensourceways/cora/internal/view"
 )
 
 // Print renders raw JSON response bytes in the requested format.

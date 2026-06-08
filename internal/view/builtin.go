@@ -253,7 +253,7 @@ var builtinViews = map[string]map[string]ViewConfig{
 	},
 
 	"etherpad": {
-		"pads/list": {
+		"pad/list-all-pads": {
 			Columns: []ViewColumn{
 				{Field: "padID", Label: "Pad ID"},
 			},

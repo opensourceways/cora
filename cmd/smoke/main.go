@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cncf/cora/internal/smoke"
+	"github.com/opensourceways/cora/internal/smoke"
 )
 
 func main() {

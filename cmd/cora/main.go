@@ -5,17 +5,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cncf/cora/internal/output/color"
+	"github.com/opensourceways/cora/internal/output/color"
 
 	"github.com/spf13/cobra"
 
-	"github.com/cncf/cora/internal/builder"
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/internal/executor"
-	"github.com/cncf/cora/internal/log"
-	"github.com/cncf/cora/internal/registry"
-	"github.com/cncf/cora/internal/view"
-	"github.com/cncf/cora/pkg/errs"
+	"github.com/opensourceways/cora/internal/builder"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/internal/executor"
+	"github.com/opensourceways/cora/internal/log"
+	"github.com/opensourceways/cora/internal/registry"
+	"github.com/opensourceways/cora/internal/view"
+	"github.com/opensourceways/cora/pkg/errs"
 )
 
 func main() {

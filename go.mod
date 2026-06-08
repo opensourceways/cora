@@ -1,4 +1,4 @@
-module github.com/cncf/cora
+module github.com/opensourceways/cora
 
 go 1.23.0
 
