@@ -66,7 +66,7 @@ cora/
 ### 命令生成机制
 
 - 命令树在运行时从 OpenAPI Spec 动态生成，**不手写具体 API 命令**
-- 资源名由三层推导（详见 `spec/spec-optimization-design.md`）：
+- 资源名由三层推导：
   1. **Path 优先**：path 中有明确子资源段（如 `/pulls/`、`/issues/`）的，优先采用 path 信号
   2. **Tag 规范化**：对 tag 做归一化（与 path 交叉验证、同义词映射、单复数统一）
   3. **Fallback**：path 最后非参数段
@@ -84,6 +84,8 @@ cora/
 - Discourse：注入 `Api-Key` / `Api-Username` 请求头
 - Etherpad：注入 `?apikey=` query 参数
 - GitCode：注入 `?access_token=` query 参数
+- GitHub：注入 `Authorization: Bearer <token>` 请求头
+- Jenkins / EUR：注入 `Authorization: Basic <base64(user:token)>` 请求头
 - 认证参数（`Api-Key`、`access_token` 等）不生成 CLI flag，由 executor 自动注入
 
 ### 内置服务
@@ -238,7 +240,6 @@ go run ./cmd/cora -- <service> <resource> <verb> [flags]  # 直接运行
 | 日志系统设计 | `spec/logging-design.md` |
 | API Token 调研 | `spec/api-token-investigation.md` |
 | CLI 设计参考 | `spec/reference-cli-design-patterns.md` |
-| Spec 优化设计 | `spec/spec-optimization-design.md` |
 
 ---
 

@@ -3,7 +3,7 @@ package output
 import (
 	"testing"
 
-	"github.com/cncf/cora/internal/view"
+	"github.com/opensourceways/cora/internal/view"
 )
 
 // --- extractItems ---

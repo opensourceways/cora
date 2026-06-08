@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/cncf/cora/internal/config"
+	"github.com/opensourceways/cora/internal/config"
 )
 
 func newGETRequest(t *testing.T, rawURL string) *http.Request {

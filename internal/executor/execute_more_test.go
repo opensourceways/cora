@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/internal/view"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/internal/view"
 )
 
 func svcConfig(serverURL string) *config.Config {

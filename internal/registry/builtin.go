@@ -3,9 +3,9 @@ package registry
 import (
 	"time"
 
-	"github.com/cncf/cora/assets"
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/internal/spec"
+	"github.com/opensourceways/cora/assets"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/internal/spec"
 )
 
 const (

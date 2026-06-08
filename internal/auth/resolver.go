@@ -8,8 +8,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/internal/log"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/internal/log"
 )
 
 // InjectAuth adds authentication credentials to an outgoing request based on
@@ -19,6 +19,8 @@ import (
 // Etherpad:  injects ?apikey= into the request URL's query string.
 // GitCode:   injects ?access_token= into the request URL's query string.
 // GitHub:    injects Authorization: Bearer <token> header.
+// Jenkins:   injects Authorization: Basic <base64(user:token)> header.
+// EUR:       injects Authorization: Basic <base64(user:token)> header.
 //
 // All providers inject credentials unconditionally when present; the server
 // ignores them for public endpoints and enforces them for protected ones.

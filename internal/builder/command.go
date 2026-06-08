@@ -21,10 +21,10 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/spf13/cobra"
 
-	"github.com/cncf/cora/internal/auth"
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/internal/executor"
-	"github.com/cncf/cora/internal/view"
+	"github.com/opensourceways/cora/internal/auth"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/internal/executor"
+	"github.com/opensourceways/cora/internal/view"
 )
 
 // Build returns a *cobra.Command for the given service, populated with one

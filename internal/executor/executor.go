@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cncf/cora/internal/auth"
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/internal/log"
-	"github.com/cncf/cora/internal/output"
-	"github.com/cncf/cora/internal/view"
-	"github.com/cncf/cora/pkg/errs"
+	"github.com/opensourceways/cora/internal/auth"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/internal/log"
+	"github.com/opensourceways/cora/internal/output"
+	"github.com/opensourceways/cora/internal/view"
+	"github.com/opensourceways/cora/pkg/errs"
 )
 
 const (

@@ -12,7 +12,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
-	"github.com/cncf/cora/internal/registry"
+	"github.com/opensourceways/cora/internal/registry"
 )
 
 // buildServicesCmd returns the `cora services` command tree.

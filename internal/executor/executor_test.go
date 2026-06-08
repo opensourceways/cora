@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cncf/cora/internal/config"
-	"github.com/cncf/cora/pkg/errs"
+	"github.com/opensourceways/cora/internal/config"
+	"github.com/opensourceways/cora/pkg/errs"
 )
 
 // cliErr extracts a *errs.CLIError from err; fails the test if not found.

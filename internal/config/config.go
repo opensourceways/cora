@@ -11,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 
-	"github.com/cncf/cora/internal/log"
+	"github.com/opensourceways/cora/internal/log"
 )
 
 const (
