@@ -1,6 +1,4 @@
 name: "forum/topics-list-top"
-skip: true
-skip_reason: "Forum instance IP whitelist not configured for CI runner — enable when network access is granted"
 service: forum
 args:
   - "topics"

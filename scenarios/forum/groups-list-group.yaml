@@ -1,6 +1,4 @@
 name: "forum/groups-list-group"
-skip: true
-skip_reason: "Forum instance IP whitelist not configured for CI runner — enable when network access is granted"
 service: forum
 args:
   - "groups"
