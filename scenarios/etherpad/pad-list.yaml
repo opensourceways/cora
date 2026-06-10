@@ -5,8 +5,6 @@ args:
   - list-all-pads
 format: table
 timeout_ms: 5000
-skip: true
-skip_reason: "Requires self-hosted Etherpad instance — set SMOKE_ETHERPAD_URL to enable"
 assertions:
   - type: exit_code
     value: 0

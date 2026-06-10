@@ -1,6 +1,5 @@
 name: "forum/posts-list"
 service: forum
-skip: true
 args:
   - posts
   - list
