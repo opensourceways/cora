@@ -49,8 +49,11 @@ cora/
 │   ├── assets.go                     # go:embed 嵌入 Spec 文件
 │   └── openapi/                      # 内置服务 OpenAPI Spec
 │       ├── etherpad/openapi.json
+│       ├── eur/openapi.json
 │       ├── forum/openapi.json
-│       └── gitcode/openapi.json
+│       ├── gitcode/openapi.json
+│       ├── github/api.github.com.json
+│       └── jenkins/openapi.json
 ├── spec/                             # 架构与设计文档
 │   ├── architecture-design.md
 │   ├── logging-design.md             # 日志系统设计（必读）
@@ -95,7 +98,11 @@ cora/
 | 服务 | 命令名 | 默认 API 地址 |
 |------|--------|--------------|
 | GitCode | `gitcode` | `https://api.gitcode.com` |
+| GitHub | `github` | `https://api.github.com` |
 | Etherpad | `etherpad` | `https://etherpad.openeuler.org/api/1.3.0` |
+| Jenkins | `jenkins` | 无默认值，需配置 base_url |
+| EUR | `eur` | `https://eur.openeuler.openatom.cn/api_3` |
+| Forum | `forum` | 无默认值，需配置 spec_url + base_url |
 
 ### OpenAPI Spec 编写规范
 
