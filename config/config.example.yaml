@@ -54,6 +54,14 @@ services:
         username: YOUR_JENKINS_USERNAME
         api_token: YOUR_JENKINS_API_TOKEN
 
+  # ── EUR / openEuler Copr（内置 Spec，无需 spec_url）──
+  # eur:
+  #   base_url: https://eur.openeuler.openatom.cn/api_3
+  #   auth:
+  #     eur:
+  #       username: "your-username"
+  #       api_token: "your-api-token"
+
   # ── Forum (Discourse) ─────────────────────────────────────────────────────────
   # spec_url: URL or local path to the service's OpenAPI spec.
   # Supported: http://, https://, file://, or a bare filesystem path.
