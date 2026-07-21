@@ -64,6 +64,34 @@ var builtinViews = map[string]map[string]ViewConfig{
 				{Field: "created_at", Label: "Created", Format: FormatDate, Width: 12},
 			},
 		},
+
+		"action/list": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "ID", Width: 8},
+				{Field: "name", Label: "Name", Width: 24},
+				{Field: "size_in_bytes", Label: "Size", Width: 12},
+				{Field: "expired_at", Label: "Expires", Format: FormatDate, Width: 12},
+			},
+		},
+		"action/list-runs": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "ID", Width: 8},
+				{Field: "name", Label: "Workflow", Width: 28},
+				{Field: "status", Label: "Status", Width: 12, Colorize: true},
+				{Field: "conclusion", Label: "Conclusion", Width: 12, Colorize: true},
+				{Field: "event", Label: "Event", Width: 10},
+				{Field: "created_at", Label: "Created", Format: FormatDate, Width: 12},
+			},
+		},
+		"action/list-jobs": {
+			Columns: []ViewColumn{
+				{Field: "id", Label: "ID", Width: 8},
+				{Field: "name", Label: "Name", Width: 32},
+				{Field: "status", Label: "Status", Width: 12, Colorize: true},
+				{Field: "conclusion", Label: "Conclusion", Width: 12, Colorize: true},
+				{Field: "started_at", Label: "Started", Format: FormatDate, Width: 12},
+			},
+		},
 		"repos/get": {
 			Columns: []ViewColumn{
 				{Field: "full_name", Label: "Repo"},

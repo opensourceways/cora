@@ -295,8 +295,39 @@ func loadEmbeddedSpec(t *testing.T, svcName string, data []byte) *cobra.Command 
 	if err != nil {
 		t.Fatalf("failed to load %s spec: %v", svcName, err)
 	}
+	// Apply built-in normalizer rules (same as LoadSpec in registry).
+	normalizer := builtinNormalizer(svcName)
+	if normalizer != nil {
+		s = normalizer.Normalize(s)
+	}
 	cfg := &config.Config{Services: map[string]config.ServiceConfig{svcName: {BaseURL: "http://x"}}}
 	return Build(svcName, s, cfg, executor.New(cfg), view.NewRegistry())
+}
+
+// builtinNormalizer returns the built-in normalizer for a service, or nil.
+func builtinNormalizer(svcName string) *spec.Normalizer {
+	switch svcName {
+	case "gitcode":
+		return spec.NewNormalizer(spec.NormalizeRule{
+			ResourceAlias: map[string]string{
+				"repositories":  "repos",
+				"organizations": "orgs",
+				"pull-requests": "pulls",
+			},
+			TagReassign: []spec.TagReassignRule{
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/pulls", Tag: "Pulls"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}", Tag: "Repositories"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/issues", Tag: "Issues"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/labels", Tag: "Labels"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/branches", Tag: "Branch"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/tags", Tag: "Tag"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/releases", Tag: "Release"},
+				{PathPrefix: "/api/v5/repos/{owner}/{repo}/milestones", Tag: "Milestone"},
+			},
+			OpIDVerbExtract: true,
+		})
+	}
+	return nil
 }
 
 func TestBuild_GitCodeUserCommands(t *testing.T) {

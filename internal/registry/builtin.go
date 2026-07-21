@@ -18,6 +18,7 @@ var (
 		},
 		TagReassign: []spec.TagReassignRule{
 			{PathPrefix: "/api/v5/repos/{owner}/{repo}/pulls", Tag: "Pulls"},
+			{PathPrefix: "/api/v5/repos/{owner}/{repo}", Tag: "Repositories"},
 			{PathPrefix: "/api/v5/repos/{owner}/{repo}/issues", Tag: "Issues"},
 			{PathPrefix: "/api/v5/repos/{owner}/{repo}/labels", Tag: "Labels"},
 			{PathPrefix: "/api/v5/repos/{owner}/{repo}/branches", Tag: "Branch"},
