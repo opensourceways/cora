@@ -12,6 +12,7 @@ import (
 	"github.com/opensourceways/cora/assets"
 	"github.com/opensourceways/cora/internal/config"
 	"github.com/opensourceways/cora/internal/executor"
+	"github.com/opensourceways/cora/internal/registry"
 	"github.com/opensourceways/cora/internal/spec"
 	"github.com/opensourceways/cora/internal/view"
 )
@@ -296,6 +297,15 @@ func loadEmbeddedSpec(t *testing.T, svcName string, data []byte) *cobra.Command 
 		t.Fatalf("failed to load %s spec: %v", svcName, err)
 	}
 	cfg := &config.Config{Services: map[string]config.ServiceConfig{svcName: {BaseURL: "http://x"}}}
+	// Use registry to load the spec with normalizer rules (same as production).
+	cfg.SpecCache.Dir = t.TempDir()
+	reg := registry.New(cfg)
+	entry, err := reg.Lookup(svcName)
+	if err == nil {
+		if normalized, loadErr := entry.LoadSpec(context.Background()); loadErr == nil {
+			s = normalized
+		}
+	}
 	return Build(svcName, s, cfg, executor.New(cfg), view.NewRegistry())
 }
 
